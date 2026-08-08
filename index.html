@@ -849,12 +849,10 @@
             textReveal02();
         }
 
-        // Unregister service workers (No offline caching)
+        // Register pass-through Service Worker for PWA install eligibility (no offline caching)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(registrations => {
-                for (let registration of registrations) {
-                    registration.unregister();
-                }
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW reg error:', err));
             });
         }
 
@@ -869,16 +867,19 @@
         });
 
         if (installPwaBtn) {
-            installPwaBtn.addEventListener('click', async () => {
+            installPwaBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
                 if (deferredPwaPrompt) {
                     deferredPwaPrompt.prompt();
                     const { outcome } = await deferredPwaPrompt.userChoice;
-                    console.log('User response to install prompt:', outcome);
+                    console.log('User prompt choice:', outcome);
                     if (outcome === 'accepted') {
                         deferredPwaPrompt = null;
                     }
-                } else if (pwaModal) {
+                } else if (pwaModal && typeof pwaModal.showModal === 'function') {
                     pwaModal.showModal();
+                } else {
+                    alert("To Add to Home Screen:\n\n• iOS (Safari): Tap Share button -> 'Add to Home Screen'\n• Android / Chrome: Tap Menu (⋮) -> 'Add to Home screen'");
                 }
             });
         }
