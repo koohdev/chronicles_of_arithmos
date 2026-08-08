@@ -1,9 +1,17 @@
-# Ignore RPG Maker MZ output build folder
-game/Tests
+# RPG Maker MZ desktop build binaries & temp outputs (allows web assets in game/Tests)
+game/Tests/*.exe
+game/Tests/*.dll
+game/Tests/*.pak
+game/Tests/*.bin
+game/Tests/*.dat
+game/Tests/swiftshader/
+game/Tests/locales/
+game/Tests/save/
+game/Tests/debug.log
 
 # Ignore agent skills and workspace configs
 .agents/
-skills-lock.json
+skills-lock.json    
 
 # Dependencies & Node
 node_modules/
