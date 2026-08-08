@@ -847,9 +847,8 @@
             }
 
             textReveal02();
-        }
 
-        // Register pass-through Service Worker for PWA install eligibility (no offline caching)
+              // PWA Install Prompt & Service Worker Logic
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW reg error:', err));
@@ -859,30 +858,59 @@
         let deferredPwaPrompt = null;
         const installPwaBtn = document.getElementById('installPwaBtn');
         const pwaModal = document.getElementById('pwaModal');
+        const modalInstallBtn = document.getElementById('modalInstallBtn');
+
+        function updateInstallButtons(ready) {
+            if (modalInstallBtn) {
+                if (ready) {
+                    modalInstallBtn.classList.remove('hidden');
+                } else {
+                    modalInstallBtn.classList.add('hidden');
+                }
+            }
+        }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPwaPrompt = e;
             console.log('PWA beforeinstallprompt captured!');
+            updateInstallButtons(true);
         });
 
-        if (installPwaBtn) {
-            installPwaBtn.addEventListener('click', async (e) => {
-                e.preventDefault();
-                if (deferredPwaPrompt) {
-                    deferredPwaPrompt.prompt();
-                    const { outcome } = await deferredPwaPrompt.userChoice;
-                    console.log('User prompt choice:', outcome);
-                    if (outcome === 'accepted') {
-                        deferredPwaPrompt = null;
-                    }
-                } else if (pwaModal && typeof pwaModal.showModal === 'function') {
-                    pwaModal.showModal();
-                } else {
-                    alert("To Add to Home Screen:\n\n• iOS (Safari): Tap Share button -> 'Add to Home Screen'\n• Android / Chrome: Tap Menu (⋮) -> 'Add to Home screen'");
+        async function triggerPwaInstall() {
+            if (deferredPwaPrompt) {
+                deferredPwaPrompt.prompt();
+                const { outcome } = await deferredPwaPrompt.userChoice;
+                console.log('User prompt choice:', outcome);
+                if (outcome === 'accepted') {
+                    deferredPwaPrompt = null;
+                    updateInstallButtons(false);
+                    if (pwaModal) pwaModal.close();
                 }
+            } else if (pwaModal && typeof pwaModal.showModal === 'function') {
+                pwaModal.showModal();
+            }
+        }
+
+        if (installPwaBtn) {
+            installPwaBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                triggerPwaInstall();
             });
         }
+
+        if (modalInstallBtn) {
+            modalInstallBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                triggerPwaInstall();
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            deferredPwaPrompt = null;
+            updateInstallButtons(false);
+            console.log('PWA successfully installed!');
+        });
     </script>
 
     <!-- PWA Install Instructions Modal -->
@@ -911,8 +939,12 @@
                 </ol>
             </div>
         </div>
-        <div class="mt-6 pt-4 border-t border-hairline flex justify-end">
-            <button type="button" onclick="document.getElementById('pwaModal').close()" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Got it!</button>
+        <div class="mt-6 pt-4 border-t border-hairline flex items-center justify-between gap-3">
+            <a href="game/index.html" class="text-xs font-medium text-[#096936] hover:underline">Launch Game Directly &rarr;</a>
+            <div class="flex items-center gap-2">
+                <button id="modalInstallBtn" type="button" class="hidden bg-ink-primary hover:bg-ink-active text-white px-4 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Install Now</button>
+                <button type="button" onclick="document.getElementById('pwaModal').close()" class="bg-surface-strong text-ink border border-hairline hover:bg-hairline px-4 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Close</button>
+            </div>
         </div>
     </dialog>
     <!-- Privacy Policy Modal -->
