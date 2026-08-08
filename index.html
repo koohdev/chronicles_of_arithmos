@@ -848,69 +848,16 @@
 
             textReveal02();
 
-              // PWA Install Prompt & Service Worker Logic
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW reg error:', err));
-            });
-        }
-
-        let deferredPwaPrompt = null;
+        // Add to Home Screen Pop-Up Tutorial Modal Handler
         const installPwaBtn = document.getElementById('installPwaBtn');
         const pwaModal = document.getElementById('pwaModal');
-        const modalInstallBtn = document.getElementById('modalInstallBtn');
 
-        function updateInstallButtons(ready) {
-            if (modalInstallBtn) {
-                if (ready) {
-                    modalInstallBtn.classList.remove('hidden');
-                } else {
-                    modalInstallBtn.classList.add('hidden');
-                }
-            }
-        }
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPwaPrompt = e;
-            console.log('PWA beforeinstallprompt captured!');
-            updateInstallButtons(true);
-        });
-
-        async function triggerPwaInstall() {
-            if (deferredPwaPrompt) {
-                deferredPwaPrompt.prompt();
-                const { outcome } = await deferredPwaPrompt.userChoice;
-                console.log('User prompt choice:', outcome);
-                if (outcome === 'accepted') {
-                    deferredPwaPrompt = null;
-                    updateInstallButtons(false);
-                    if (pwaModal) pwaModal.close();
-                }
-            } else if (pwaModal && typeof pwaModal.showModal === 'function') {
-                pwaModal.showModal();
-            }
-        }
-
-        if (installPwaBtn) {
+        if (installPwaBtn && pwaModal) {
             installPwaBtn.addEventListener('click', (e) => {
                 e.preventDefault();
-                triggerPwaInstall();
+                pwaModal.showModal();
             });
         }
-
-        if (modalInstallBtn) {
-            modalInstallBtn.addEventListener('click', (e) => {
-                e.preventDefault();
-                triggerPwaInstall();
-            });
-        }
-
-        window.addEventListener('appinstalled', () => {
-            deferredPwaPrompt = null;
-            updateInstallButtons(false);
-            console.log('PWA successfully installed!');
-        });
 
         // Prevent pinch gesture zoom on mobile Safari
         document.addEventListener('gesturestart', function (e) {
@@ -918,38 +865,51 @@
         });
     </script>
 
-    <!-- PWA Install Instructions Modal -->
+    <!-- Add to Home Screen Pop-Up Tutorial Modal -->
     <dialog id="pwaModal" class="backdrop:bg-black/60 backdrop:backdrop-blur-sm rounded-2xl bg-canvas text-ink border border-hairline p-6 sm:p-8 max-w-md w-[90vw] shadow-2xl m-auto">
         <div class="flex items-center justify-between border-b border-hairline pb-4 mb-4">
             <h3 class="font-display text-2xl text-ink flex items-center gap-2">
-                <img src="game/icon/icon.png" alt="App Icon" class="w-7 h-7 object-contain">
+                <img src="game/icon/icon.png" alt="App Icon" class="w-7 h-7 object-contain rounded-md shadow-sm">
                 Add Game to Home Screen
             </h3>
             <button type="button" onclick="document.getElementById('pwaModal').close()" class="text-text-muted hover:text-ink p-1 rounded-full text-xl leading-none">&times;</button>
         </div>
+        
         <div class="space-y-4 text-sm text-text-muted leading-relaxed">
-            <p>Installing adds <strong class="text-ink">Chronicles of Arithmos</strong> directly to your device home screen so it launches straight into the game!</p>
+            <p>Follow these quick steps to add <strong class="text-ink">Chronicles of Arithmos</strong> directly to your home screen for one-tap gaming!</p>
+            
+            <!-- iOS Safari Instructions -->
             <div class="bg-surface-strong p-4 rounded-xl space-y-2 border border-hairline">
-                <p class="font-semibold text-ink">iPhone / iPad (Safari):</p>
-                <ol class="list-decimal list-inside space-y-1 text-xs">
-                    <li>Tap the <strong class="text-ink">Share</strong> button (bottom toolbar).</li>
-                    <li>Scroll down & tap <strong class="text-ink">'Add to Home Screen'</strong>.</li>
+                <p class="font-semibold text-ink flex items-center gap-1.5">
+                    <span>📱</span> iPhone / iPad (Safari):
+                </p>
+                <ol class="list-decimal list-inside space-y-1 text-xs text-text-body">
+                    <li>Tap the <strong class="text-ink">Share</strong> button (bottom browser bar).</li>
+                    <li>Scroll down and tap <strong class="text-ink">'Add to Home Screen'</strong>.</li>
+                    <li>Tap <strong class="text-ink">'Add'</strong> at top-right to confirm.</li>
                 </ol>
             </div>
+
+            <!-- Android Chrome Instructions -->
             <div class="bg-surface-strong p-4 rounded-xl space-y-2 border border-hairline">
-                <p class="font-semibold text-ink">Android / Chrome / Edge:</p>
-                <ol class="list-decimal list-inside space-y-1 text-xs">
-                    <li>Tap the menu button (<strong class="text-ink">⋮</strong> top-right).</li>
+                <p class="font-semibold text-ink flex items-center gap-1.5">
+                    <span>🤖</span> Android (Chrome / Edge / Firefox):
+                </p>
+                <ol class="list-decimal list-inside space-y-1 text-xs text-text-body">
+                    <li>Tap the menu button (<strong class="text-ink">⋮</strong> top-right corner).</li>
                     <li>Tap <strong class="text-ink">'Add to Home screen'</strong> or <strong class="text-ink">'Install app'</strong>.</li>
+                    <li>Confirm by tapping <strong class="text-ink">'Add'</strong>.</li>
                 </ol>
             </div>
         </div>
+
         <div class="mt-6 pt-4 border-t border-hairline flex items-center justify-between gap-3">
-            <a href="game/index.html" class="text-xs font-medium text-[#096936] hover:underline">Launch Game Directly &rarr;</a>
-            <div class="flex items-center gap-2">
-                <button id="modalInstallBtn" type="button" class="hidden bg-ink-primary hover:bg-ink-active text-white px-4 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Install Now</button>
-                <button type="button" onclick="document.getElementById('pwaModal').close()" class="bg-surface-strong text-ink border border-hairline hover:bg-hairline px-4 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Close</button>
-            </div>
+            <a href="game/index.html" class="text-xs font-medium text-[#096936] hover:underline flex items-center gap-1">
+                <span>Play directly in browser</span> &rarr;
+            </a>
+            <button type="button" onclick="document.getElementById('pwaModal').close()" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer shadow-sm">
+                Got it!
+            </button>
         </div>
     </dialog>
     <!-- Privacy Policy Modal -->
