@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Title & SEO Metadata -->
+    <title>Chronicles of Arithmos — Educational 2D Math RPG</title>
+    <meta name="description" content="Chronicles of Arithmos is an engaging 2D educational role-playing game designed to help primary school students master math skills through turn-based fantasy combat.">
+    <meta name="keywords" content="Chronicles of Arithmos, Educational RPG, Math Game, Math RPG, 2D RPG, Game-Based Learning, Elementary Math">
+    <meta name="author" content="Chronicles of Arithmos Team">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="apple-touch-icon" href="images/favicon.png">
+
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="Chronicles of Arithmos — Educational 2D Math RPG">
+    <meta property="og:description" content="Master arithmetic through turn-based fantasy combat. An engaging 2D educational RPG for young learners.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="images/favicon.png">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Chronicles of Arithmos — Educational 2D Math RPG">
+    <meta name="twitter:description" content="Master arithmetic through turn-based fantasy combat. An engaging 2D educational RPG for young learners.">
+    <meta name="twitter:image" content="images/favicon.png">
+    
+    <!-- Editorial Typography: EB Garamond (Substitute for Waldenburg) & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Lenis & GSAP -->
+    <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.26/dist/lenis.css">
+    <script src="https://unpkg.com/lenis@1.3.26/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script type="module" src="https://esm.sh/number-flow"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        canvas: {
+                            DEFAULT: '#f5f5f5',
+                            soft: '#fafafa',
+                            deep: '#096936'
+                        },
+                        ink: {
+                            DEFAULT: '#096936',
+                            primary: '#2d985a',
+                            active: '#167648'
+                        },
+                        surface: {
+                            card: '#ffffff',
+                            strong: '#f0efed',
+                        },
+                        hairline: {
+                            DEFAULT: '#e7e5e4',
+                            soft: '#f0efed',
+                            strong: '#d6d3d1'
+                        },
+                        text: {
+                            body: '#4e4e4e',
+                            muted: '#777169'
+                        },
+                        orb: {
+                            mint: '#a7e5d3',
+                            peach: '#f4c5a8',
+                            lavender: '#c8b8e0',
+                            sky: '#a8c8e8',
+                            rose: '#e8b8c4'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['"EB Garamond"', 'serif'],
+                        body: ['"Inter"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 16px rgba(0, 0, 0, 0.04)',
+                    },
+                    letterSpacing: {
+                        'display-mega': '-1.92px',
+                        'display-xl': '-0.96px',
+                        'display-lg': '-0.36px',
+                        'body': '0.16px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #f5f5f5; 
+            color: #4e4e4e; 
+            letter-spacing: 0.16px;
+        }
+        
+        /* Atmospheric Orbs & Hero Gradient */
+        .hero-gradient-overlay {
+            background: linear-gradient(to bottom, rgba(245, 245, 245, 0.12) 0%, rgba(245, 245, 245, 0.45) 55%, rgba(245, 245, 245, 0.9) 88%, #f5f5f5 100%);
+        }
+        .orb-sky { background: radial-gradient(circle, rgba(132,193,123,0.5) 0%, rgba(245,245,245,0) 70%); }
+        .orb-lavender { background: radial-gradient(circle, rgba(87,176,102,0.4) 0%, rgba(245,245,245,0) 70%); }
+        .orb-peach { background: radial-gradient(circle, rgba(132,193,123,0.4) 0%, rgba(250,250,250,0) 70%); }
+        
+        /* Sleek Range Slider */
+        input[type=range] { -webkit-appearance: none; background: transparent; width: 100%; }
+        input[type=range]:focus { outline: none; }
+        input[type=range]::-webkit-slider-thumb { 
+            -webkit-appearance: none; height: 24px; width: 24px; 
+            border-radius: 9999px; background: #096936; 
+            cursor: pointer; margin-top: -10px; border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        input[type=range]::-webkit-slider-runnable-track { 
+            width: 100%; height: 4px; cursor: pointer; 
+            background: #d6d3d1; border-radius: 9999px; 
+        }
+
+        /* Clean scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f5f5f5; }
+        ::-webkit-scrollbar-thumb { background: #84c17b; border-radius: 10px; }
+
+        /* Tactile Active States & Focus Visibility */
+        button, a, .group { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s; }
+        button:active, a:active { transform: scale(0.97); }
+        :focus:not(:focus-visible) { outline: none; }
+        :focus-visible { outline: 2px solid #096936; outline-offset: 2px; border-radius: 4px; }
+
+        /* Lock body scroll when mobile menu is open */
+        .no-scroll { overflow: hidden; }
+
+        /* Text Reveal 02 hidden state */
+        [data-reveal-02] {
+            visibility: hidden;
+        }
+    </style>
+</head>
+<body class="font-body antialiased flex flex-col min-h-screen overflow-x-hidden">
+
+    <!-- Skip Link for Accessibility -->
+    <a href="#interactive-experience" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:bg-ink focus:text-white focus:px-5 focus:py-2.5 focus:rounded-full">
+        Skip to game preview
+    </a>
+
+    <!-- Top Navigation -->
+    <header class="fixed top-4 inset-x-0 w-full z-50 flex justify-center px-4 pointer-events-none">
+        <div class="w-full max-w-[1000px] bg-surface-card/90 backdrop-blur-md border border-hairline rounded-full shadow-soft flex items-center justify-between pl-5 md:pl-6 pr-2 py-2 transition-all pointer-events-auto">
+            <!-- Left: Logo -->
+            <div class="flex items-center">
+                <img src="images/logo-transparent.png" alt="Chronicles of Arithmos" class="h-7 md:h-8 object-contain">
+            </div>
+            
+            <!-- Desktop Nav -->
+            <nav class="hidden md:flex items-center space-x-8">
+                <a href="#interactive-experience" class="text-[14px] font-medium text-ink hover:text-text-muted transition-colors">Overview</a>
+                <a href="#game-overview" class="text-[14px] font-medium text-ink hover:text-text-muted transition-colors">Story & Realms</a>
+            </nav>
+
+            <!-- Right: CTA & Mobile Menu Toggle -->
+            <div class="flex items-center space-x-1">
+                <!-- Audio Toggle Button (Icon Only, Matches Download for PC style & Play Free height) -->
+                <button id="audioToggleBtn" 
+                        class="flex items-center justify-center w-9 h-9 rounded-full bg-surface-strong text-ink border border-[#096936] hover:bg-hairline transition-all shadow-sm" 
+                        aria-label="Toggle Audio" 
+                        title="Toggle Background Music">
+                    <!-- Volume High Icon (ON) -->
+                    <svg id="audioOnIcon" class="w-4 h-4 hidden text-[#096936] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                    </svg>
+                    <!-- Mute Icon (OFF) -->
+                    <svg id="audioOffIcon" class="w-4 h-4 text-[#096936]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+                    </svg>
+                </button>
+                <audio id="bgMusic" autoplay loop src="images/audio/Castle1.ogg" preload="auto"></audio>
+
+                <div class="hidden md:block">
+                    <a href="#interactive-experience" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-[14px] font-medium transition-colors shadow-sm inline-block">
+                        Play Free
+                    </a>
+                </div>
+                <button id="mobileMenuBtn" class="md:hidden text-ink p-1" aria-label="Toggle Menu">
+                    <svg id="menuIcon" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                    <svg id="closeIcon" class="w-6 h-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mobile Navigation Overlay -->
+    <div id="mobileMenu" class="fixed inset-0 bg-canvas z-40 hidden flex-col pt-[84px] px-6 pb-6 overflow-y-auto">
+        <nav class="flex flex-col space-y-2 mt-4">
+            <a href="#interactive-experience" class="text-[24px] font-display text-ink py-3 border-b border-hairline" onclick="toggleMobileMenu()">Overview</a>
+            <a href="#game-overview" class="text-[24px] font-display text-ink py-3 border-b border-hairline" onclick="toggleMobileMenu()">Story & Realms</a>
+        </nav>
+        <div class="mt-8 flex flex-col">
+            <a href="#interactive-experience" class="bg-ink hover:bg-ink-active text-white px-5 py-3.5 rounded-full text-[16px] font-medium text-center transition-colors w-full shadow-sm" onclick="toggleMobileMenu()">
+                Play Free
+            </a>
+        </div>
+    </div>
+
+    <main class="flex-grow">
+        
+        <!-- Hero Section -->
+        <section class="relative isolate pt-[110px] pb-16 md:pt-[165px] md:pb-[96px] px-6 overflow-hidden flex flex-col items-center text-center">
+            <!-- Grassland Background Image (Bottom Layer) -->
+            <div class="absolute inset-0 z-0 overflow-hidden">
+                <img src="images/Grassland.png" alt="Grassland Background" class="w-full h-full object-cover object-center pointer-events-none" />
+            </div>
+
+            <!-- Subtle Background Gradient Overlay (Layered on top of Grassland) -->
+            <div class="absolute inset-0 z-10 hero-gradient-overlay pointer-events-none"></div>
+
+            <!-- Atmospheric Orbs -->
+            <div class="absolute top-[-10%] left-[-20%] w-[100vw] h-[100vw] md:w-[60vw] md:h-[60vw] orb-sky rounded-full blur-[60px] md:blur-[80px] z-10 pointer-events-none"></div>
+            <div class="absolute top-[10%] right-[-20%] w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw] orb-lavender rounded-full blur-[60px] md:blur-[80px] z-10 pointer-events-none"></div>
+
+            <div class="max-w-3xl z-20 flex flex-col items-center mt-4">
+                
+                <h1 data-reveal="true" class="font-display text-ink text-[40px] leading-[1.1] md:text-[64px] md:leading-[1.05] tracking-display-lg md:tracking-display-mega mb-6">
+                    A math adventure game for primary students.
+                </h1>
+                
+                <p data-reveal="true" data-delay="0.1" class="text-text-body text-[15px] md:text-[16px] max-w-xl mx-auto mb-8 md:mb-10 leading-[1.6]">
+                    Explore new worlds, meet friendly characters, and practice math as you play. Math questions automatically match your skill level.
+                </p>
+                
+                <div data-reveal="true" data-delay="0.2" class="flex flex-col sm:flex-row items-center gap-3 md:gap-4 w-full sm:w-auto px-4 sm:px-0">
+                    <a href="#interactive-experience" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-3 md:py-2.5 rounded-full text-[15px] font-medium transition-colors w-full sm:w-auto">
+                        Play in browser
+                    </a>
+                    <button class="bg-surface-strong text-ink border border-[#096936] px-5 py-3 md:py-2.5 rounded-full text-[15px] font-medium transition-colors w-full sm:w-auto">
+                        Download for PC
+                    </button>
+                </div>
+            </div>
+                
+            <div class="mt-12 z-20 w-full max-w-[1200px] aspect-video min-h-[250px] bg-surface-card rounded-[16px] border border-hairline shadow-soft relative flex flex-col items-center justify-center overflow-hidden group cursor-pointer">
+                <img src="images/logo-transparent.png" alt="Chronicles of Arithmos Gameplay Preview" class="object-contain w-1/2 h-1/2 opacity-10 absolute z-0 pointer-events-none" />
+                <div class="z-10 flex flex-col items-center gap-4 group-hover:scale-105 transition-transform">
+                    <div class="w-16 h-16 bg-ink rounded-full flex items-center justify-center shadow-lg">
+                        <svg class="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
+                    </div>
+                    <span class="bg-surface-strong text-ink px-4 py-2 rounded-full text-sm font-medium">Watch Trailer</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pinned Centered Storytelling Section -->
+        <section id="interactive-experience" class="story-scroll-container relative bg-canvas min-h-[350vh] overflow-hidden">
+            
+            <!-- Stretched Subtle Background Gradient Overlay (Matching Hero) -->
+            <div class="absolute inset-0 hero-gradient-overlay pointer-events-none z-0"></div>
+            
+            <!-- Atmospheric Orbs Layer -->
+            <div class="absolute top-[15%] left-[-15%] w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw] orb-sky rounded-full blur-[80px] opacity-40 pointer-events-none z-0"></div>
+            <div class="absolute bottom-[15%] right-[-15%] w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw] orb-lavender rounded-full blur-[80px] opacity-40 pointer-events-none z-0"></div>
+            <div class="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] md:w-[45vw] md:h-[45vw] orb-peach rounded-full blur-[100px] opacity-35 pointer-events-none z-0"></div>
+
+            <div class="story-pinned-viewport sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden px-6 py-12 z-10">
+                
+                <!-- Centered Main Wrapper -->
+                <div class="max-w-3xl w-full text-center relative flex flex-col items-center justify-center min-h-[320px] md:min-h-[380px]">
+                    
+                    <!-- Step 1 (Use Math for Magic Spells) -->
+                    <div id="storyStep1" class="story-step absolute inset-0 flex flex-col items-center justify-center w-full">
+                        <h2 class="font-display text-ink text-3xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tight mb-6">
+                            Use math to cast magic spells
+                        </h2>
+                        <p data-story-reveal="words" class="text-text-muted text-lg md:text-2xl leading-relaxed max-w-2xl">
+                            Every time you solve a math problem, your hero casts magic, uses a shield, or attacks a monster.
+                        </p>
+                    </div>
+
+                    <!-- Step 2 (Questions at Your Speed) -->
+                    <div id="storyStep2" class="story-step absolute inset-0 flex flex-col items-center justify-center w-full opacity-0 pointer-events-none">
+                        <h2 class="font-display text-ink text-3xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tight mb-6">
+                            Questions that fit your level
+                        </h2>
+                        <p data-story-reveal="words" class="text-text-muted text-lg md:text-2xl leading-relaxed max-w-2xl">
+                            The game gives you easier or harder math questions based on how you answer, so you can learn without feeling stuck.
+                        </p>
+                    </div>
+
+                    <!-- Step 3 (Practice Area in Town) -->
+                    <div id="storyStep3" class="story-step absolute inset-0 flex flex-col items-center justify-center w-full opacity-0 pointer-events-none">
+                        <h2 class="font-display text-ink text-3xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tight mb-6">
+                            Practice anytime with no pressure
+                        </h2>
+                        <p data-story-reveal="words" class="text-text-muted text-lg md:text-2xl leading-relaxed max-w-2xl">
+                            Visit the Training Dummy in town to practice addition and subtraction for as long as you want with zero game-over risk.
+                        </p>
+                    </div>
+
+                    <!-- Step 4 (Team Up & Explore) -->
+                    <div id="storyStep4" class="story-step absolute inset-0 flex flex-col items-center justify-center w-full opacity-0 pointer-events-none">
+                        <h2 class="font-display text-ink text-3xl md:text-5xl lg:text-6xl leading-[1.1] tracking-tight mb-6">
+                            Explore and play with friends
+                        </h2>
+                        <p data-story-reveal="words" class="text-text-muted text-lg md:text-2xl leading-relaxed max-w-2xl">
+                            Travel through forests, deserts, and icy mountains. Share a room code to solve math challenges together with your classmates.
+                        </p>
+                    </div>
+
+                </div>
+            </div>
+        <!-- Game & Story Overview Section -->
+        <section id="game-overview" class="pt-16 md:pt-24 pb-16 md:pb-[15rem] px-4 sm:px-6 lg:px-8 max-w-[1500px] mx-auto relative overflow-hidden">
+            <div class="w-full relative z-10">
+                <!-- Section Header -->
+                <div class="text-center max-w-3xl mx-auto mb-16">
+                    <h2 class="font-display text-ink text-3xl sm:text-4xl md:text-5xl leading-[1.15] tracking-tight mb-6">
+                        Explore 4 story worlds filled<br>with math & magic.
+                    </h2>
+                    <p class="text-text-muted text-base sm:text-lg md:text-xl leading-relaxed">
+                        In <strong class="text-ink font-semibold">Chronicles of Arithmos</strong>, you wake up in the Plains of Origin. Guided by your mentors Bron and Martha, you go on a story quest to cure your sister Lily and bring peace back to the kingdom.
+                    </p>
+                </div>
+
+                <!-- Story Biomes Journey Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+                    <!-- Biome 1: Plains & Forest -->
+                    <div class="relative overflow-hidden group rounded-2xl p-6 border border-[#096936]/30 shadow-lg flex flex-col justify-between hover:border-[#096936]/60 transition-all min-h-[320px]">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                            <img src="images/GrassMaze 1.png" alt="Plains & Forest Biome" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-65" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col justify-between h-full text-white">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-white/15 text-white flex items-center justify-center font-bold text-sm mb-4 border border-white/25 backdrop-blur-md">
+                                    01
+                                </div>
+                                <h3 class="font-display text-white text-xl font-medium mb-2 drop-shadow-md">Plains & Forest</h3>
+                                <p class="text-white/85 text-sm leading-relaxed mb-4 drop-shadow-sm">
+                                    Learn game controls, solve addition and subtraction questions, and battle the Forest Golem.
+                                </p>
+                            </div>
+                            <span class="text-[12px] font-medium text-white bg-black/45 border border-white/20 px-3 py-1 rounded-full inline-block self-start backdrop-blur-md">Guardian: Forest Golem</span>
+                        </div>
+                    </div>
+
+                    <!-- Biome 2: Desert Wasteland -->
+                    <div class="relative overflow-hidden group rounded-2xl p-6 border border-[#096936]/30 shadow-lg flex flex-col justify-between hover:border-[#096936]/60 transition-all min-h-[320px]">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                            <img src="images/Wasteland 2.png" alt="Desert Wasteland Biome" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-65" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col justify-between h-full text-white">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-white/15 text-white flex items-center justify-center font-bold text-sm mb-4 border border-white/25 backdrop-blur-md">
+                                    02
+                                </div>
+                                <h3 class="font-display text-white text-xl font-medium mb-2 drop-shadow-md">Desert Wasteland</h3>
+                                <p class="text-white/85 text-sm leading-relaxed mb-4 drop-shadow-sm">
+                                    Travel across sandy deserts, answer multi-step math questions, and overcome the Pharaoh's Guard.
+                                </p>
+                            </div>
+                            <span class="text-[12px] font-medium text-white bg-black/45 border border-white/20 px-3 py-1 rounded-full inline-block self-start backdrop-blur-md">Guardian: Pharaoh's Guard</span>
+                        </div>
+                    </div>
+
+                    <!-- Biome 3: Frozen Tundra -->
+                    <div class="relative overflow-hidden group rounded-2xl p-6 border border-[#096936]/30 shadow-lg flex flex-col justify-between hover:border-[#096936]/60 transition-all min-h-[320px]">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                            <img src="images/IceCave 2.png" alt="Frozen Tundra Biome" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-65" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col justify-between h-full text-white">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-white/15 text-white flex items-center justify-center font-bold text-sm mb-4 border border-white/25 backdrop-blur-md">
+                                    03
+                                </div>
+                                <h3 class="font-display text-white text-xl font-medium mb-2 drop-shadow-md">Frozen Tundra</h3>
+                                <p class="text-white/85 text-sm leading-relaxed mb-4 drop-shadow-sm">
+                                    Cross icy snows, solve order of operations math (PEMDAS), and challenge the wolf Fenrir.
+                                </p>
+                            </div>
+                            <span class="text-[12px] font-medium text-white bg-black/45 border border-white/20 px-3 py-1 rounded-full inline-block self-start backdrop-blur-md">Guardian: Fenrir Wolf</span>
+                        </div>
+                    </div>
+
+                    <!-- Biome 4: Volcanic Void -->
+                    <div class="relative overflow-hidden group rounded-2xl p-6 border border-[#096936]/30 shadow-lg flex flex-col justify-between hover:border-[#096936]/60 transition-all min-h-[320px]">
+                        <!-- Background Image -->
+                        <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                            <img src="images/Lava2 1.png" alt="Volcanic Void Biome" class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 opacity-65" />
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-black/30"></div>
+                        </div>
+
+                        <div class="relative z-10 flex flex-col justify-between h-full text-white">
+                            <div>
+                                <div class="w-10 h-10 rounded-xl bg-white/15 text-white flex items-center justify-center font-bold text-sm mb-4 border border-white/25 backdrop-blur-md">
+                                    04
+                                </div>
+                                <h3 class="font-display text-white text-xl font-medium mb-2 drop-shadow-md">Volcanic Void</h3>
+                                <p class="text-white/85 text-sm leading-relaxed mb-4 drop-shadow-sm">
+                                    Enter the final area for the ultimate math challenge against The Numeromancer to save Arithmos.
+                                </p>
+                            </div>
+                            <span class="text-[12px] font-medium text-white bg-black/45 border border-white/20 px-3 py-1 rounded-full inline-block self-start backdrop-blur-md">Final Boss: The Numeromancer</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pre-footer CTA Card -->
+        <section class="py-12 md:py-20 px-4 sm:px-6 lg:px-8 max-w-[1500px] mx-auto">
+            <div class="relative w-full rounded-3xl bg-surface-strong border border-[#096936]/30 overflow-hidden shadow-2xl pt-12 pb-[9rem] sm:pb-[11rem] md:pt-16 md:pb-[13rem] px-6 sm:px-12 flex flex-col items-center text-center">
+                <!-- Background Image (ready-to-play-bg.png) - Bottom Layer (z-0) -->
+                <div class="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                    <img src="images/ready-to-play-bg.png" alt="Ready to play background" class="w-full opacity-70 h-full object-cover object-center" />
+                </div>
+
+                <!-- Subtle Background Gradient Overlay (Layered on top of Background Image - z-10) -->
+                <div class="absolute inset-0 z-10 hero-gradient-overlay pointer-events-none opacity-85"></div>
+
+                <!-- Atmospheric Orbs Layer (z-10) -->
+                <div class="absolute -top-[20%] -left-[10%] w-[50vw] h-[50vw] max-w-[500px] max-h-[500px] orb-sky rounded-full blur-[80px] opacity-40 pointer-events-none z-10"></div>
+                <div class="absolute -bottom-[20%] -right-[10%] w-[50vw] h-[50vw] max-w-[500px] max-h-[500px] orb-peach rounded-full blur-[80px] opacity-40 pointer-events-none z-10"></div>
+
+                <!-- Text & Button Content (z-20) -->
+                <div class="relative z-20 flex flex-col items-center max-w-xl">
+                    <h2 class="font-display text-ink font-semibold text-[30px] sm:text-[36px] md:text-[40px] leading-[1.15] tracking-display-lg mb-6 md:mb-8">
+                        Ready to start your math adventure?
+                    </h2>
+                    <a href="#interactive-experience" class="bg-ink-primary hover:bg-ink-active text-white px-8 py-3.5 md:py-4 rounded-full text-[15px] font-medium transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5 w-full sm:w-auto">
+                        Play now in browser
+                    </a>
+                </div>
+
+                <!-- Characters Lineup INSIDE Card Bottom (z-20) -->
+                <div class="flex items-end justify-center w-full absolute inset-x-0 bottom-0 z-20 select-none pointer-events-none -space-x-4 sm:-space-x-8 md:-space-x-10 lg:-space-x-12 px-2 sm:px-6">
+                    <!-- Left Facing Right Characters -->
+                    <img src="images/characters/Actor1_1.png" alt="Character 1" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="transform: scaleX(-1); image-rendering: pixelated;" />
+                    <img src="images/characters/Actor1_3.png" alt="Character 3" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="transform: scaleX(-1); image-rendering: pixelated;" />
+                    <img src="images/characters/Actor3_3.png" alt="Actor 3_3" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="transform: scaleX(-1); image-rendering: pixelated;" />
+                    <img src="images/characters/People2_7.png" alt="People 2_7" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="transform: scaleX(-1); image-rendering: pixelated;" />
+                    <img src="images/characters/Actor1_7.png" alt="Character 7" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="transform: scaleX(-1); image-rendering: pixelated;" />
+                    <img src="images/characters/Actor3_7.png" alt="Actor 3_7" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="transform: scaleX(-1); image-rendering: pixelated;" />
+
+                    <!-- Middle Characters -->
+                    <img src="images/characters/Actor2_6.png" alt="Actor 2_6" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="image-rendering: pixelated;" />
+                    <img src="images/characters/Actor3_2.png" alt="Actor 3_2" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="image-rendering: pixelated;" />
+
+                    <!-- Right Facing Left Characters -->
+                    <img src="images/characters/People1_2.png" alt="People 1_2" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="image-rendering: pixelated;" />
+                    <img src="images/characters/Actor2_8.png" alt="Character 12" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="image-rendering: pixelated;" />
+                    <img src="images/characters/Actor2_4.png" alt="Character 10" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="image-rendering: pixelated;" />
+                    <img src="images/characters/Actor1_8.png" alt="Character 6" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="image-rendering: pixelated;" />
+                    <img src="images/characters/Actor1_2.png" alt="Character 2" class="h-16 sm:h-24 md:h-34 lg:h-44 xl:h-48 w-auto object-contain drop-shadow-md transition-transform hover:scale-105" style="image-rendering: pixelated;" />
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative isolate overflow-hidden bg-canvas pt-16 pb-8 md:pt-24 md:pb-12 px-6">
+        <div class="max-w-[1450px] mx-auto relative z-20 flex flex-col">
+
+            <!-- Top Footer Grid -->
+            <div class="flex flex-col md:flex-row justify-between items-start gap-10 md:gap-16 mb-12 md:mb-16">
+                <!-- Left Tagline -->
+                <div class="max-w-md">
+                    <h3 class="font-display text-ink text-[28px] md:text-[36px] leading-[1.15] tracking-display-lg">
+                        Experience the adventure
+                    </h3>
+                </div>
+
+                <!-- Right Links Columns -->
+                <div class="grid grid-cols-2 gap-12 sm:gap-16 md:gap-24">
+                    <!-- Product Column -->
+                    <div>
+                        <h4 class="text-[13px] font-bold text-[#096936] uppercase tracking-wider mb-4">Explore</h4>
+                        <ul class="space-y-2.5 text-[14px] font-medium text-[#096936]">
+                            <li><a href="#interactive-experience" class="hover:text-ink-primary transition-colors">Play in browser</a></li>
+                            <li><a href="#story-reveal" class="hover:text-ink-primary transition-colors">Story & Features</a></li>
+                            <li><a href="#interactive-experience" class="hover:text-ink-primary transition-colors">Download Game</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Resources Column -->
+                    <div>
+                        <h4 class="text-[13px] font-bold text-[#096936] uppercase tracking-wider mb-4">Resources</h4>
+                        <ul class="space-y-2.5 text-[14px] font-medium text-[#096936]">
+                            <li><a href="#interactive-experience" class="hover:text-ink-primary transition-colors">Game Manual</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Giant Brand Display Text (Matching Reference Layout) -->
+            <div class="w-full my-2 md:my-6 overflow-hidden select-none">
+                <h2 class="font-display text-ink/90 text-[13vw] sm:text-[14vw] lg:text-[150px] font-normal leading-none tracking-tight text-center md:text-left uppercase whitespace-nowrap">
+                    Arithmos
+                </h2>
+            </div>
+
+            <!-- Bottom Sub-footer Bar -->
+            <div class="border-t border-hairline/80 pt-8 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <!-- Copyright -->
+                <span class="text-[13px] text-text-muted">© 2026 Chronicles of Arithmos</span>
+
+                <!-- Right Sub-links -->
+                <div class="flex flex-wrap items-center justify-center gap-6 text-[13px] text-text-muted">
+                    <a href="#story-reveal" class="hover:text-ink transition-colors">About Project</a>
+                    <button type="button" onclick="document.getElementById('privacyModal').showModal()" class="hover:text-ink transition-colors cursor-pointer bg-transparent border-0 p-0 text-[13px] text-text-muted">Privacy Policy</button>
+                    <button type="button" onclick="document.getElementById('termsModal').showModal()" class="hover:text-ink transition-colors cursor-pointer bg-transparent border-0 p-0 text-[13px] text-text-muted">Terms of Use</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // Audio Toggle & Default Autoplay Logic
+        const bgMusic = document.getElementById('bgMusic');
+        const audioToggleBtn = document.getElementById('audioToggleBtn');
+        const audioOnIcon = document.getElementById('audioOnIcon');
+        const audioOffIcon = document.getElementById('audioOffIcon');
+        let isAudioPlaying = false;
+
+        function setAudioUIState(playing) {
+            isAudioPlaying = playing;
+            if (playing) {
+                audioOnIcon?.classList.remove('hidden');
+                audioOffIcon?.classList.add('hidden');
+                audioToggleBtn?.classList.add('bg-ink-primary/20');
+            } else {
+                audioOnIcon?.classList.add('hidden');
+                audioOffIcon?.classList.remove('hidden');
+                audioToggleBtn?.classList.remove('bg-ink-primary/20');
+            }
+        }
+
+        function attemptPlayMusic() {
+            if (!bgMusic) return;
+            bgMusic.play().then(() => {
+                setAudioUIState(true);
+            }).catch(err => {
+                setAudioUIState(false);
+                // Listen for first user interaction to trigger audio if browser blocked initial autoplay
+                const enableOnUserGesture = () => {
+                    bgMusic.play().then(() => {
+                        setAudioUIState(true);
+                        document.removeEventListener('click', enableOnUserGesture);
+                    }).catch(() => {});
+                };
+                document.addEventListener('click', enableOnUserGesture, { once: true });
+            });
+        }
+
+        if (audioToggleBtn && bgMusic) {
+            // Attempt autoplay when document is ready
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                attemptPlayMusic();
+            } else {
+                document.addEventListener('DOMContentLoaded', attemptPlayMusic);
+            }
+
+            // Manual toggle button listener
+            audioToggleBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isAudioPlaying) {
+                    bgMusic.pause();
+                    setAudioUIState(false);
+                } else {
+                    bgMusic.play().then(() => {
+                        setAudioUIState(true);
+                    }).catch(err => {
+                        console.log('Audio playback blocked:', err);
+                    });
+                }
+            });
+        }
+
+        // Mobile Menu Logic
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const menuIcon = document.getElementById('menuIcon');
+        const closeIcon = document.getElementById('closeIcon');
+        const body = document.body;
+
+        function toggleMobileMenu() {
+            const isOpen = !mobileMenu.classList.contains('hidden');
+            
+            if (isOpen) {
+                mobileMenu.classList.add('hidden');
+                mobileMenu.classList.remove('flex');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+                body.classList.remove('no-scroll');
+            } else {
+                mobileMenu.classList.remove('hidden');
+                mobileMenu.classList.add('flex');
+                menuIcon.classList.add('hidden');
+                closeIcon.classList.remove('hidden');
+                body.classList.add('no-scroll');
+            }
+        }
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+
+        // Initialize Lenis Smooth Scroll
+        const lenis = new Lenis({
+            autoRaf: false,
+            anchors: true,
+            allowNestedScroll: true,
+            stopInertiaOnNavigate: true
+        });
+
+        // Initialize Mobile-Friendly Kinetic GSAP Reveals
+        if (typeof gsap !== "undefined" && typeof ScrollTrigger !== "undefined") {
+            gsap.registerPlugin(ScrollTrigger);
+
+            lenis.on('scroll', ScrollTrigger.update);
+            gsap.ticker.add((time) => {
+                lenis.raf(time * 1000);
+            });
+            gsap.ticker.lagSmoothing(0);
+
+            function initReveals() {
+                const revealEls = document.querySelectorAll('[data-reveal]');
+                revealEls.forEach((el, index) => {
+                    if (el.getAttribute("data-revealed") === "true") return;
+
+                    const delay = parseFloat(el.getAttribute("data-delay")) || 0;
+                    gsap.fromTo(el, 
+                        { y: 24, opacity: 0 },
+                        {
+                            y: 0,
+                            opacity: 1,
+                            duration: 0.8,
+                            ease: "power2.out",
+                            delay: delay,
+                            scrollTrigger: {
+                                trigger: el,
+                                start: "top 90%",
+                                once: true
+                            },
+                            onComplete: () => {
+                                el.setAttribute("data-revealed", "true");
+                            }
+                        }
+                    );
+                });
+            }
+
+            // Guard resizes by window width to protect mobile scrolling
+            let lastWidth = window.innerWidth;
+            let resizeTimeout;
+
+            window.addEventListener("resize", () => {
+                const currentWidth = window.innerWidth;
+                if (currentWidth === lastWidth) return; // Ignore height shifts
+                lastWidth = currentWidth;
+
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    ScrollTrigger.refresh();
+                }, 250);
+            });
+
+            initReveals();
+
+            // Pinned Centered Story Text Reveals Logic
+            function initStoryScroll() {
+                const storyContainer = document.querySelector('.story-scroll-container');
+                if (!storyContainer) return;
+
+                // Split words for data-story-reveal elements
+                const storyReveals = storyContainer.querySelectorAll('[data-story-reveal]');
+                storyReveals.forEach(el => {
+                    if (!el.dataset.splitDone) {
+                        el.dataset.splitDone = "true";
+                        const words = el.innerText.trim().split(/\s+/);
+                        el.innerHTML = words.map(w => `<span class="story-word inline-block mr-[0.25em] transition-opacity duration-200">${w}</span>`).join('');
+                    }
+                });
+
+                const step1 = document.getElementById('storyStep1');
+                const step2 = document.getElementById('storyStep2');
+                const step3 = document.getElementById('storyStep3');
+                const step4 = document.getElementById('storyStep4');
+                if (!step1 || !step2 || !step3 || !step4) return;
+
+                const step1Words = step1.querySelectorAll('.story-word');
+                const step2Words = step2.querySelectorAll('.story-word');
+                const step3Words = step3.querySelectorAll('.story-word');
+                const step4Words = step4.querySelectorAll('.story-word');
+
+                // Initial word states (opacity 0.15)
+                gsap.set([step1Words, step2Words, step3Words, step4Words], { opacity: 0.15 });
+
+                const tl = gsap.timeline({
+                    scrollTrigger: {
+                        trigger: ".story-scroll-container",
+                        start: "top top",
+                        end: "bottom bottom",
+                        pin: ".story-pinned-viewport",
+                        scrub: 1,
+                        pinSpacing: true
+                    }
+                });
+
+                // Scrub Timeline Sequence
+                tl.to(step1Words, { opacity: 1, stagger: 0.08, duration: 1 })
+                  .to(step1, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.4 }, "+=0.3")
+                  .fromTo(step2, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
+                  .to(step2Words, { opacity: 1, stagger: 0.08, duration: 1 })
+                  .to(step2, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.4 }, "+=0.3")
+                  .fromTo(step3, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
+                  .to(step3Words, { opacity: 1, stagger: 0.08, duration: 1 })
+                  .to(step3, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.4 }, "+=0.3")
+                  .fromTo(step4, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
+                  .to(step4Words, { opacity: 1, stagger: 0.08, duration: 1 });
+            }
+
+            initStoryScroll();
+
+            // Text Reveal 02 Implementation (FADE_IN_TEXT_REVEAL.md)
+            function textReveal02(scope = document, delay = 0, { ignoreManual = false } = {}) {
+                const CONFIG = {
+                    lines: { duration: 0.04, stagger: 0.03, ease: "power1.out" },
+                    words: { duration: 0.04, stagger: 0.03, ease: "power1.out" },
+                    chars: { duration: 0.04, stagger: 0.03, ease: "power1.out" },
+                    scrollStart: "top 85%",
+                    scrubStart: "top 80%",
+                    scrubEnd: "top 30%",
+                    once: true,
+                    markers: false,
+                };
+
+                const allSplitEls = scope.querySelectorAll("[data-reveal-02]");
+                const autoEls = ignoreManual
+                    ? [...allSplitEls]
+                    : [...allSplitEls].filter((el) => !el.hasAttribute("data-manual"));
+
+                gsap.set(autoEls, { visibility: "visible" });
+
+                allSplitEls.forEach((el) => {
+                    const splitType = el.getAttribute("data-reveal-02");
+                    const c = CONFIG[splitType];
+                    if (!c) return;
+
+                    let targets;
+                    if (typeof SplitText !== "undefined") {
+                        let type, linesClass, wordsClass, charsClass;
+                        switch (splitType) {
+                            case "lines": type = "lines"; linesClass = "line"; break;
+                            case "words": type = "words, lines"; wordsClass = "word"; linesClass = "line"; break;
+                            case "chars": type = "chars, words, lines"; charsClass = "char"; wordsClass = "word"; linesClass = "line"; break;
+                        }
+                        const splitInstance = SplitText.create(el, { type, autoSplit: true, linesClass, wordsClass, charsClass });
+                        targets = splitInstance[splitType] || splitInstance.words || splitInstance.chars;
+                    } else {
+                        if (!el.dataset.splitDone) {
+                            el.dataset.splitDone = "true";
+                            const text = el.innerText.trim();
+                            if (splitType === 'words' || splitType === 'lines') {
+                                const words = text.split(/\s+/);
+                                el.innerHTML = words.map(w => `<span class="word inline-block mr-[0.25em]">${w}</span>`).join('');
+                            } else if (splitType === 'chars') {
+                                const chars = text.split('');
+                                el.innerHTML = chars.map(ch => `<span class="char inline-block">${ch === ' ' ? '&nbsp;' : ch}</span>`).join('');
+                            }
+                        }
+                        targets = el.querySelectorAll('.' + (splitType === 'chars' ? 'char' : 'word'));
+                    }
+
+                    const scrollMode = el.getAttribute("data-scroll");
+                    const useScroll = el.hasAttribute("data-scroll");
+                    const useScrub = scrollMode === "scrub";
+
+                    const durationValue = parseFloat(el.dataset.duration);
+                    const staggerValue = parseFloat(el.dataset.stagger);
+                    const delayValue = parseFloat(el.dataset.delay);
+                    const duration = Number.isNaN(durationValue) ? c.duration : durationValue;
+                    const stagger = Number.isNaN(staggerValue) ? c.stagger : staggerValue;
+                    const elDelay = Number.isNaN(delayValue) ? 0 : delayValue;
+                    const ease = el.dataset.ease || c.ease;
+                    const once = el.hasAttribute("data-once") ? el.getAttribute("data-once") !== "false" : CONFIG.once;
+
+                    const tween = {
+                        opacity: 0.1,
+                        duration,
+                        stagger,
+                        delay: useScroll ? elDelay : elDelay + delay,
+                        immediateRender: true,
+                        ease,
+                    };
+
+                    if (useScrub) {
+                        tween.scrollTrigger = {
+                            trigger: el,
+                            start: CONFIG.scrubStart,
+                            end: CONFIG.scrubEnd,
+                            scrub: true,
+                            markers: CONFIG.markers,
+                            ...(once && { onLeave: (self) => self.kill(false) }),
+                        };
+                    } else if (useScroll) {
+                        const start = (scrollMode && scrollMode !== 'true' && scrollMode !== 'scrub') ? scrollMode : CONFIG.scrollStart;
+                        tween.scrollTrigger = {
+                            trigger: el,
+                            start: `clamp(${start})`,
+                            markers: CONFIG.markers,
+                            ...(once ? { toggleActions: "play none none none" } : { toggleActions: "play none none reverse" }),
+                        };
+                    }
+
+                    gsap.from(targets, tween);
+                });
+            }
+
+            textReveal02();
+        }
+    </script>
+    <!-- Privacy Policy Modal -->
+    <dialog id="privacyModal" class="backdrop:bg-black/60 backdrop:backdrop-blur-sm rounded-2xl bg-canvas text-ink border border-hairline p-6 sm:p-8 max-w-xl w-[90vw] shadow-2xl m-auto">
+        <div class="flex items-center justify-between border-b border-hairline pb-4 mb-4">
+            <h3 class="font-display text-2xl text-ink">Privacy Policy</h3>
+            <button type="button" onclick="document.getElementById('privacyModal').close()" class="text-text-muted hover:text-ink p-1 rounded-full text-xl leading-none">&times;</button>
+        </div>
+        <div class="space-y-4 text-sm text-text-muted leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+            <p><strong class="text-ink">Chronicles of Arithmos</strong> is designed as a safe, privacy-first educational math game for primary school students.</p>
+            <p><strong class="text-ink">1. Zero Data Collection:</strong> We do not collect, store, or sell any personal student data, email addresses, or identifying information.</p>
+            <p><strong class="text-ink">2. Local Browser Storage:</strong> Game progress, badges earned, and volume settings are stored strictly on your local web browser.</p>
+            <p><strong class="text-ink">3. Child Safety Guarantee:</strong> The game contains zero third-party ads, zero tracking scripts, and zero in-app purchases.</p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-hairline flex justify-end">
+            <button type="button" onclick="document.getElementById('privacyModal').close()" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Close</button>
+        </div>
+    </dialog>
+
+    <!-- Terms of Use Modal -->
+    <dialog id="termsModal" class="backdrop:bg-black/60 backdrop:backdrop-blur-sm rounded-2xl bg-canvas text-ink border border-hairline p-6 sm:p-8 max-w-xl w-[90vw] shadow-2xl m-auto">
+        <div class="flex items-center justify-between border-b border-hairline pb-4 mb-4">
+            <h3 class="font-display text-2xl text-ink">Terms of Use</h3>
+            <button type="button" onclick="document.getElementById('termsModal').close()" class="text-text-muted hover:text-ink p-1 rounded-full text-xl leading-none">&times;</button>
+        </div>
+        <div class="space-y-4 text-sm text-text-muted leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+            <p><strong class="text-ink">Chronicles of Arithmos</strong> is provided for non-commercial educational and learning purposes.</p>
+            <p><strong class="text-ink">1. Educational Use:</strong> Students, parents, and educators may freely play, share, and utilize the game for primary school mathematics learning.</p>
+            <p><strong class="text-ink">2. Intellectual Property:</strong> All original artwork, game sprites, story elements, and puzzles belong to the Chronicles of Arithmos academic project team.</p>
+            <p><strong class="text-ink">3. Fair Play:</strong> Play responsibly and enjoy solving math challenges with friends!</p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-hairline flex justify-end">
+            <button type="button" onclick="document.getElementById('termsModal').close()" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Close</button>
+        </div>
+    </dialog>
+</body>
+</html>
