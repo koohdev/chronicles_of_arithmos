@@ -225,10 +225,16 @@
             <a href="#interactive-experience" class="text-[24px] font-display text-ink py-3 border-b border-hairline" onclick="toggleMobileMenu()">Overview</a>
             <a href="#game-overview" class="text-[24px] font-display text-ink py-3 border-b border-hairline" onclick="toggleMobileMenu()">Story & Realms</a>
         </nav>
-        <div class="mt-8 flex flex-col">
+        <div class="mt-8 flex flex-col space-y-3">
             <a href="game/index.html" class="bg-ink hover:bg-ink-active text-white px-5 py-3.5 rounded-full text-[16px] font-medium text-center transition-colors w-full shadow-sm" onclick="toggleMobileMenu()">
                 Play Free
             </a>
+            <button type="button" onclick="toggleMobileMenu(); document.getElementById('pwaModal').showModal()" class="bg-surface-strong text-ink border border-[#096936] px-5 py-3.5 rounded-full text-[16px] font-medium text-center transition-colors w-full shadow-sm flex items-center justify-center gap-2 cursor-pointer">
+                <svg class="w-4 h-4 text-[#096936]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 18h16" />
+                </svg>
+                Add to Home Screen
+            </button>
         </div>
     </div>
 
@@ -262,7 +268,7 @@
                     <a href="game/index.html" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-3 md:py-2.5 rounded-full text-[15px] font-medium transition-colors w-full sm:w-auto text-center">
                         Play in browser
                     </a>
-                    <button id="installPwaBtn" type="button" class="md:hidden bg-surface-strong text-ink border border-[#096936] hover:bg-hairline px-5 py-3 md:py-2.5 rounded-full text-[15px] font-medium transition-colors w-full sm:w-auto text-center flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                    <button id="installPwaBtn" type="button" onclick="document.getElementById('pwaModal').showModal()" class="md:hidden bg-surface-strong text-ink border border-[#096936] hover:bg-hairline px-5 py-3 md:py-2.5 rounded-full text-[15px] font-medium transition-colors w-full sm:w-auto text-center flex items-center justify-center gap-2 cursor-pointer shadow-sm">
                         <svg class="w-4 h-4 text-[#096936]" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v12m0 0l-4-4m4 4l4-4M4 18h16" />
                         </svg>
