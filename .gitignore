@@ -12,7 +12,7 @@ game/Tests/debug.log
 
 # Ignore agent skills and workspace configs
 .agents/
-skills-lock.json    
+skills-lock.json
 
 # Dependencies & Node
 node_modules/
