@@ -136,6 +136,22 @@
         /* Lock body scroll when mobile menu is open */
         .no-scroll { overflow: hidden; }
 
+        /* Pinned Storytelling Mobile GPU Acceleration */
+        .story-pinned-viewport {
+            transform: translateZ(0);
+            will-change: transform;
+            backface-visibility: hidden;
+        }
+        .story-step {
+            will-change: transform, opacity;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+        .story-word {
+            will-change: opacity;
+            transform: translateZ(0);
+        }
+
         /* Text Reveal 02 hidden state */
         [data-reveal-02] {
             visibility: hidden;
@@ -272,7 +288,7 @@
             <div class="absolute bottom-[15%] right-[-15%] w-[80vw] h-[80vw] md:w-[50vw] md:h-[50vw] orb-lavender rounded-full blur-[80px] opacity-40 pointer-events-none z-0"></div>
             <div class="absolute top-[50%] left-[50%] -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] md:w-[45vw] md:h-[45vw] orb-peach rounded-full blur-[100px] opacity-35 pointer-events-none z-0"></div>
 
-            <div class="story-pinned-viewport sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden px-6 py-12 z-10">
+            <div class="story-pinned-viewport h-screen h-[100dvh] w-full flex items-center justify-center overflow-hidden px-6 py-12 z-10">
                 
                 <!-- Centered Main Wrapper -->
                 <div class="max-w-3xl w-full text-center relative flex flex-col items-center justify-center min-h-[320px] md:min-h-[380px]">
@@ -319,6 +335,8 @@
 
                 </div>
             </div>
+        </section>
+
         <!-- Game & Story Overview Section -->
         <section id="game-overview" class="pt-16 md:pt-24 pb-16 md:pb-[15rem] px-4 sm:px-6 lg:px-8 max-w-[1500px] mx-auto relative overflow-hidden">
             <div class="w-full relative z-10">
@@ -695,7 +713,7 @@
                     if (!el.dataset.splitDone) {
                         el.dataset.splitDone = "true";
                         const words = el.innerText.trim().split(/\s+/);
-                        el.innerHTML = words.map(w => `<span class="story-word inline-block mr-[0.25em] transition-opacity duration-200">${w}</span>`).join('');
+                        el.innerHTML = words.map(w => `<span class="story-word inline-block mr-[0.25em] transition-opacity duration-150">${w}</span>`).join('');
                     }
                 });
 
@@ -713,28 +731,33 @@
                 // Initial word states (opacity 0.15)
                 gsap.set([step1Words, step2Words, step3Words, step4Words], { opacity: 0.15 });
 
+                const isTouch = window.matchMedia("(pointer: coarse)").matches || window.innerWidth < 768;
+
                 const tl = gsap.timeline({
                     scrollTrigger: {
                         trigger: ".story-scroll-container",
                         start: "top top",
                         end: "bottom bottom",
                         pin: ".story-pinned-viewport",
-                        scrub: 1,
-                        pinSpacing: true
+                        scrub: isTouch ? 0.2 : 0.6, // Fast, smooth scrubbing on touch devices
+                        pinSpacing: true,
+                        anticipatePin: 1,
+                        invalidateOnRefresh: true
                     }
                 });
 
                 // Scrub Timeline Sequence
-                tl.to(step1Words, { opacity: 1, stagger: 0.08, duration: 1 })
-                  .to(step1, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.4 }, "+=0.3")
-                  .fromTo(step2, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
-                  .to(step2Words, { opacity: 1, stagger: 0.08, duration: 1 })
-                  .to(step2, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.4 }, "+=0.3")
-                  .fromTo(step3, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
-                  .to(step3Words, { opacity: 1, stagger: 0.08, duration: 1 })
-                  .to(step3, { opacity: 0, y: -20, pointerEvents: 'none', duration: 0.4 }, "+=0.3")
-                  .fromTo(step4, { opacity: 0, y: 20 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
-                  .to(step4Words, { opacity: 1, stagger: 0.08, duration: 1 });
+                tl.to(step1Words, { opacity: 1, stagger: 0.06, duration: 1 })
+                  .to(step1, { opacity: 0, y: -25, pointerEvents: 'none', duration: 0.4 }, "+=0.2")
+                  .fromTo(step2, { opacity: 0, y: 25 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
+                  .to(step2Words, { opacity: 1, stagger: 0.06, duration: 1 })
+                  .to(step2, { opacity: 0, y: -25, pointerEvents: 'none', duration: 0.4 }, "+=0.2")
+                  .fromTo(step3, { opacity: 0, y: 25 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
+                  .to(step3Words, { opacity: 1, stagger: 0.06, duration: 1 })
+                  .to(step3, { opacity: 0, y: -25, pointerEvents: 'none', duration: 0.4 }, "+=0.2")
+                  .fromTo(step4, { opacity: 0, y: 25 }, { opacity: 1, y: 0, pointerEvents: 'auto', duration: 0.4 })
+                  .to(step4Words, { opacity: 1, stagger: 0.06, duration: 1 })
+                  .to({}, { duration: 1.0 }); // Hold Step 4 visible before unpinning so it doesn't overflow/bleed into the next section!
             }
 
             initStoryScroll();
@@ -847,7 +870,7 @@
             <p><strong class="text-ink">Chronicles of Arithmos</strong> is designed as a safe, privacy-first educational math game for primary school students.</p>
             <p><strong class="text-ink">1. Zero Data Collection:</strong> We do not collect, store, or sell any personal student data, email addresses, or identifying information.</p>
             <p><strong class="text-ink">2. Local Browser Storage:</strong> Game progress, badges earned, and volume settings are stored strictly on your local web browser.</p>
-            <p><strong class="text-ink">3. Child Safety Guarantee:</strong> The game contains zero third-party ads, zero tracking scripts, and zero in-app purchases.</p>
+            <p><strong class="text-ink">3. Child Safety Guarantee:</strong> The game contains zero third-party ads, zero tracking scripts</p>
         </div>
         <div class="mt-6 pt-4 border-t border-hairline flex justify-end">
             <button type="button" onclick="document.getElementById('privacyModal').close()" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Close</button>
