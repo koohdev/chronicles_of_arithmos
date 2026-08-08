@@ -200,7 +200,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
                     </svg>
                 </button>
-                <audio id="bgMusic" autoplay loop src="images/audio/Castle1.ogg" preload="auto"></audio>
+                <audio id="bgMusic" loop src="images/audio/Castle1.ogg" preload="auto"></audio>
 
                 <div class="hidden md:block">
                     <a href="game/index.html" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-[14px] font-medium transition-colors shadow-sm inline-block">
@@ -563,7 +563,7 @@
 
     <!-- Logic -->
     <script>
-        // Audio Toggle & Default Autoplay Logic
+        // Audio Toggle Logic (Plays ONLY when music icon button is clicked)
         const bgMusic = document.getElementById('bgMusic');
         const audioToggleBtn = document.getElementById('audioToggleBtn');
         const audioOnIcon = document.getElementById('audioOnIcon');
@@ -583,32 +583,10 @@
             }
         }
 
-        function attemptPlayMusic() {
-            if (!bgMusic) return;
-            bgMusic.play().then(() => {
-                setAudioUIState(true);
-            }).catch(err => {
-                setAudioUIState(false);
-                // Listen for first user interaction to trigger audio if browser blocked initial autoplay
-                const enableOnUserGesture = () => {
-                    bgMusic.play().then(() => {
-                        setAudioUIState(true);
-                        document.removeEventListener('click', enableOnUserGesture);
-                    }).catch(() => {});
-                };
-                document.addEventListener('click', enableOnUserGesture, { once: true });
-            });
-        }
-
         if (audioToggleBtn && bgMusic) {
-            // Attempt autoplay when document is ready
-            if (document.readyState === 'complete' || document.readyState === 'interactive') {
-                attemptPlayMusic();
-            } else {
-                document.addEventListener('DOMContentLoaded', attemptPlayMusic);
-            }
+            bgMusic.pause();
+            setAudioUIState(false);
 
-            // Manual toggle button listener
             audioToggleBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 if (isAudioPlaying) {
@@ -619,6 +597,7 @@
                         setAudioUIState(true);
                     }).catch(err => {
                         console.log('Audio playback blocked:', err);
+                        setAudioUIState(false);
                     });
                 }
             });
@@ -884,6 +863,7 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPwaPrompt = e;
+            console.log('PWA beforeinstallprompt captured!');
         });
 
         if (installPwaBtn) {
@@ -891,6 +871,7 @@
                 if (deferredPwaPrompt) {
                     deferredPwaPrompt.prompt();
                     const { outcome } = await deferredPwaPrompt.userChoice;
+                    console.log('User response to install prompt:', outcome);
                     if (outcome === 'accepted') {
                         deferredPwaPrompt = null;
                     }
