@@ -1,5 +1,6 @@
 # RPG Maker MZ desktop build binaries & temp outputs (allows web assets in game/Tests)
 game/Tests/*.exe
+!game/Tests/Game.exe
 game/Tests/*.dll
 game/Tests/*.pak
 game/Tests/*.bin
