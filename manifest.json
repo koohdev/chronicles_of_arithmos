@@ -1,0 +1,23 @@
+{
+  "name": "Chronicles of Arithmos",
+  "short_name": "Arithmos Game",
+  "description": "Educational 2D Math RPG Game for Primary Students",
+  "start_url": "game/index.html",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#000000",
+  "theme_color": "#096936",
+  "icons": [
+    {
+      "src": "game/icon/icon.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/favicon.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    }
+  ]
+}
