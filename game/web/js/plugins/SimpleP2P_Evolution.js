@@ -1,6 +1,6 @@
 /*:
  * @target MZ
- * @plugindesc [V16] Multiplayer: Full Stat Sync and Chat Alerts
+ * @plugindesc [V17] Multiplayer: Perfect Party Merge, Escape Sync, & UI Stats
  *
  * @param Sync Interval
  * @desc Frames between updates. 1 = Fastest/Smoother.
@@ -14,14 +14,15 @@
  *
  * @help
  * ============================================================================
- * SIMPLE P2P: V16 (FULL SYNC AND ALERTS)
+ * SIMPLE P2P: V17 (STABILITY & UI UPDATE)
  * ============================================================================
  * FIXES AND ADDITIONS:
- * 1. HP, MP, and TP sync live so both players see accurate stats.
- * 2. Chat messages display when a player joins a fight.
- * 3. Chat messages display when a player leaves or runs from a fight.
- * 4. Uses the actual username of the player for the chat messages.
- * 5. Auto restores the party if a player flees to keep the game stable.
+ * 1. FIXED: Duplicate characters forming if joining was pressed multiple times.
+ * 2. FIXED: Status Window now accurately and instantly updates remote HP/MP/TP.
+ * 3. FIXED: Clients are now properly ejected from battle if the host finishes.
+ * 4. FIXED: "Ghost sprites" lingering on screen after someone leaves the party.
+ * 5. FIXED: Enemy death animations now sync and play for BOTH players.
+ * 6. FIXED: Clones now properly copy Face and Battler graphics.
  *
  * INSTRUCTIONS:
  * 1. Host: SimpleP2P.host()
@@ -30,7 +31,7 @@
  */
 
 (() => {
-    const params = PluginManager.parameters('SimpleP2P_V16');
+    const params = PluginManager.parameters('SimpleP2P_V17');
     const SYNC_RATE = Number(params['Sync Interval']) || 1; 
     const COMBAT_ICON = Number(params['Combat Icon ID']) || 76;
 
@@ -41,12 +42,14 @@
         isConnected: false,
         isHost: false,
         originalParty: null,
+        hasMerged: false,
         wasRemoteFighting: false,
         remoteData: {
             x: 0, y: 0, mapId: 0, 
             charName: "", charIndex: 0, 
             isFighting: false, 
-            actors: [] 
+            actors: [],
+            enemies: []
         },
         
         // --- 1. CONNECTION ---
@@ -114,7 +117,7 @@
                     if (this.remoteData.isFighting) {
                         $gameMessage.add(this.remoteData.charName + " left the fight!");
                     }
-                    BattleManager.processAbort(); 
+                    if (this.originalParty) BattleManager.processAbort(); 
                     this.restoreParty();
                     this.refreshBattleVisuals(true);
                 }
@@ -136,22 +139,18 @@
                 this.processGhostMovement();
             }
 
-            // Detect if partner leaves the fight
+            // Detect if partner leaves or finishes the fight!
             if (this.wasRemoteFighting && !this.remoteData.isFighting) {
                 if (SceneManager._scene instanceof Scene_Battle) {
                     $gameMessage.add(this.remoteData.charName + " left the fight!");
-                    this.restoreParty();
-                    this.refreshBattleVisuals(true);
+                    
+                    // If I am a CLIENT in their fight, safely abort to map!
+                    if (this.originalParty && !this.isHost) {
+                        BattleManager.processAbort(); 
+                    }
                 }
             }
             this.wasRemoteFighting = this.remoteData.isFighting;
-
-            // Battle Visuals Safety Check
-            if (SceneManager._scene instanceof Scene_Battle) {
-                if (Graphics.frameCount % 60 === 0) {
-                    this.refreshBattleVisuals();
-                }
-            }
         },
 
         sendUpdate: function() {
@@ -159,25 +158,28 @@
             const inBattle = (SceneManager._scene instanceof Scene_Battle);
             if (!leader) return;
 
-            // Send full stats to fix the invisible UI bug
             const myActors = $gameParty.members().slice(0, 2).map(a => ({
                 id: a.actorId(),
-                hp: a.hp,
-                mp: a.mp,
-                tp: a.tp,
-                mhp: a.mhp,
-                mmp: a.mmp
+                level: a.level,
+                name: a.name(),
+                hp: a.hp, mp: a.mp, tp: a.tp,
+                mhp: a.mhp, mmp: a.mmp
             }));
+
+            let enemyData = [];
+            if (inBattle) {
+                // Both players constantly broadcast their version of the enemies!
+                enemyData = $gameTroop.members().map(e => ({ hp: e.hp, dead: e.isDead() || e.hp === 0 }));
+            }
 
             const packet = {
                 type: 'state',
                 mapId: $gameMap.mapId(),
-                x: $gamePlayer.x,
-                y: $gamePlayer.y,
-                charName: leader.characterName(),
-                charIndex: leader.characterIndex(),
+                x: $gamePlayer.x, y: $gamePlayer.y,
+                charName: leader.characterName(), charIndex: leader.characterIndex(),
                 isFighting: inBattle,
-                actors: myActors 
+                actors: myActors,
+                enemies: enemyData
             };
             try { this.conn.send(packet); } catch(e) {}
         },
@@ -189,23 +191,25 @@
             }
             
             if (data.type === 'request_join') {
-                if (SceneManager._scene instanceof Scene_Battle) {
-                    const myActors = $gameParty.members().slice(0, 2).map(a => a.actorId());
+                // Ensure only the HOST of a battle can accept joins to prevent double-merging
+                if (SceneManager._scene instanceof Scene_Battle && !this.originalParty) {
+                    const myActorsData = $gameParty.members().slice(0, 2).map(a => ({
+                        id: a.actorId(), level: a.level, name: a.name(), hp: a.hp, mp: a.mp, tp: a.tp
+                    }));
                     this.conn.send({ 
                         type: 'accept_join', 
                         troopId: $gameTroop._troopId,
-                        hostActors: myActors
+                        hostActors: myActorsData
                     });
                     
-                    const remoteActorIds = this.remoteData.actors.map(a => a.id);
-                    this.mergeParty(remoteActorIds);
+                    this.mergeParty(this.remoteData.actors);
                     $gameMessage.add(this.remoteData.charName + " joined the fight!");
                 }
             }
             
             if (data.type === 'accept_join') {
                 this.joinBattleAsClient(data.troopId, data.hostActors);
-                $gameMessage.add("Joined " + this.remoteData.charName + " fight!");
+                $gameMessage.add("Joined " + this.remoteData.charName + "'s fight!");
             }
 
             if (data.type === 'battle_action') {
@@ -215,20 +219,49 @@
 
         // --- 3. LIVE STAT SYNC ---
         syncRemoteStats: function() {
-            if (!this.originalParty) return; 
+            if (!this.originalParty || !this.hasMerged) return; 
             
             if (SceneManager._scene instanceof Scene_Battle) {
-                this.remoteData.actors.forEach(rActor => {
-                    const localActor = $gameActors.actor(rActor.id);
-                    // Only update if it is the other players character
-                    if (localActor && !this.originalParty.includes(rActor.id)) {
-                        localActor._hp = rActor.hp;
-                        localActor._mp = rActor.mp;
-                        localActor._tp = rActor.tp;
+                let needsRefresh = false;
+                
+                this.remoteData.actors.forEach((rActor, index) => {
+                    const cloneId = 100 + index; 
+                    const localActor = $gameActors.actor(cloneId);
+                    if (localActor) {
+                        if (localActor.hp !== rActor.hp || localActor.mp !== rActor.mp || localActor.tp !== rActor.tp) {
+                            localActor.setHp(rActor.hp);
+                            localActor.setMp(rActor.mp);
+                            localActor.setTp(rActor.tp);
+                            needsRefresh = true;
+                        }
                     }
                 });
+
+                // --- ENEMY SYNC (Both Ways) ---
+                if (this.remoteData.enemies) {
+                    this.remoteData.enemies.forEach((rEnemy, i) => {
+                        const localEnemy = $gameTroop.members()[i];
+                        if (localEnemy) {
+                            // If remote says it's dead, forcefully collapse it!
+                            if ((rEnemy.dead || rEnemy.hp === 0) && localEnemy.isAlive()) {
+                                localEnemy.setHp(0);
+                                localEnemy.die();
+                                localEnemy.performCollapse();
+                                needsRefresh = true;
+                            } else if (rEnemy.hp < localEnemy.hp && !localEnemy.isDead()) {
+                                // Keep HP synced to whoever did damage
+                                localEnemy.setHp(rEnemy.hp);
+                                needsRefresh = true;
+                            }
+                        }
+                    });
+                    
+                    if ($gameTroop.isAllDead() && !BattleManager.isBattleEnd()) {
+                        BattleManager.checkBattleEnd();
+                    }
+                }
                 
-                if (SceneManager._scene._statusWindow) {
+                if (needsRefresh && SceneManager._scene._statusWindow) {
                     SceneManager._scene._statusWindow.refresh();
                 }
             }
@@ -243,22 +276,69 @@
             if (this.originalParty) {
                 $gameParty._actors = this.originalParty.slice();
                 this.originalParty = null;
+                this.hasMerged = false;
                 $gamePlayer.refresh();
             }
         },
 
-        mergeParty: function(remoteActorIds) {
-            if (!this.originalParty) this.backupParty();
-            const myActors = $gameParty._actors.slice(0, 2);
-            $gameParty._actors = myActors.concat(remoteActorIds);
+        createClone: function(originalId, cloneId, data) {
+            // 1. Copy full database entry
+            $dataActors[cloneId] = JSON.parse(JSON.stringify($dataActors[originalId]));
             
+            // 2. Force Graphic Sync!
+            const liveActor = $gameActors.actor(originalId);
+            if (liveActor) {
+                $dataActors[cloneId].faceName = liveActor.faceName();
+                $dataActors[cloneId].faceIndex = liveActor.faceIndex();
+                $dataActors[cloneId].battlerName = liveActor.battlerName();
+                $dataActors[cloneId].characterName = liveActor.characterName();
+                $dataActors[cloneId].characterIndex = liveActor.characterIndex();
+            }
+
+            // 3. Setup Instance
+            $gameActors._data[cloneId] = new Game_Actor(cloneId);
+            const clone = $gameActors.actor(cloneId);
+            
+            clone._name = data.name;
+            clone.changeLevel(data.level, false);
+            clone.setHp(data.hp);
+            clone.setMp(data.mp);
+            clone.setTp(data.tp);
+        },
+
+        mergeParty: function(remoteActorData) {
+            if (this.hasMerged) return; 
+            if (!this.originalParty) this.backupParty();
+            
+            const myActors = this.originalParty.slice();
+            const remoteIds = [];
+            
+            remoteActorData.forEach((rData, index) => {
+                const cloneId = 100 + index; 
+                this.createClone(rData.id, cloneId, rData);
+                remoteIds.push(cloneId);
+            });
+            
+            $gameParty._actors = myActors.concat(remoteIds);
+            
+            this.hasMerged = true;
             this.refreshBattleVisuals(true); 
         },
 
-        joinBattleAsClient: function(troopId, hostActorIds) {
+        joinBattleAsClient: function(troopId, hostActorData) {
+            if (this.hasMerged) return; 
             if (!this.originalParty) this.backupParty();
-            const myActors = $gameParty._actors.slice(0, 2);
-            $gameParty._actors = hostActorIds.concat(myActors);
+            
+            const myActors = this.originalParty.slice();
+            const hostIds = [];
+            
+            hostActorData.forEach((hData, index) => {
+                const cloneId = 100 + index; 
+                this.createClone(hData.id, cloneId, hData);
+                hostIds.push(cloneId);
+            });
+            
+            $gameParty._actors = hostIds.concat(myActors);
             $gamePlayer.refresh();
             
             BattleManager.setup(troopId, true, true);
@@ -266,7 +346,20 @@
             $gamePlayer.makeEncounterCount();
             SceneManager.push(Scene_Battle);
             
+            this.hasMerged = true;
             setTimeout(() => this.refreshBattleVisuals(true), 100);
+        },
+
+        // Helper to check if the acting character belongs to the local player
+        isLocalActor: function(subject) {
+            if (!this.isConnected || !this.hasMerged || !this.originalParty) return true;
+            if (!subject || !subject.isActor()) return false;
+            
+            if (this.isHost) {
+                return subject.index() < this.originalParty.length;
+            } else {
+                return subject.index() >= ($gameParty.members().length - this.originalParty.length);
+            }
         },
 
         // --- CRITICAL VISUAL FIXES ---
@@ -289,8 +382,10 @@
                 if (spriteset._actorSprites) {
                     for (const sprite of spriteset._actorSprites) {
                         if (spriteset._battleField) spriteset._battleField.removeChild(sprite);
+                        sprite.destroy(); 
                     }
                 }
+                spriteset._actorSprites = []; 
                 spriteset.createActors();
             }
 
@@ -322,8 +417,6 @@
             if (data.mapId !== $gameMap.mapId()) {
                 event.setOpacity(0);
                 
-                // --- NEW TETHER LOGIC ---
-                // If I am NOT the host, force me to teleport to the Host's map!
                 if (!this.isHost && data.mapId > 0) {
                     if (!$gamePlayer.isTransferring() && !(SceneManager._scene instanceof Scene_Battle)) {
                         console.log("Host changed maps. Tethering...");
@@ -349,6 +442,8 @@
         },
 
         onGhostInteract: function() {
+            if (SceneManager._scene instanceof Scene_Battle) return;
+
             if (this.remoteData.isFighting) {
                 $gameMessage.add("Join Fight?");
                 $gameMessage.setChoices(["Yes", "No"], 0, 1);
@@ -398,7 +493,6 @@
     // ======================================================================
     //  HOOKS
     // ======================================================================
-
     const _Scene_Map_update = Scene_Map.prototype.update;
     Scene_Map.prototype.update = function() {
         _Scene_Map_update.call(this);
@@ -459,8 +553,11 @@
     const _BattleManager_invokeAction = BattleManager.invokeAction;
     BattleManager.invokeAction = function(subject, target) {
         _BattleManager_invokeAction.call(this, subject, target);
-        if (subject && subject.isActor() && subject.index() < 2) { 
-             SimpleP2P.broadcastAction(subject, this._action);
+        if (subject && subject.isActor()) { 
+             // Only broadcast if the character actually belongs to THIS game client!
+             if (!window.SimpleP2P || window.SimpleP2P.isLocalActor(subject)) {
+                 SimpleP2P.broadcastAction(subject, this._action);
+             }
         }
     };
 

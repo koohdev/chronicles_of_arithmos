@@ -1,7 +1,7 @@
 /*:
  * @target MZ
  * @plugindesc Adds a "Quests" option to the Main Menu to track Commissions and Story.
- * @author Gemini AI
+ * 
  *
  * @param Main Story Variable
  * @desc The Variable ID used to store the current Main Story text.

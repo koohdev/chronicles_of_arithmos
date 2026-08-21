@@ -1,7 +1,7 @@
 /*:
  * @target MZ
  * @plugindesc V3.6: Clean Text + Map Level Reward Scaling + Higher Item Counts.
- * @author Gemini AI
+ * 
  *
  * @param Quest Variable ID
  * @desc Variable ID to store the Quest Status (0:None, 1:Active).

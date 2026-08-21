@@ -1,7 +1,7 @@
 /*:
  * @target MZ
  * @plugindesc (MZ) Math Battle System V11 - Mobile Keypad Support
- * @author Gemini AI
+ * 
  *
  * @help
  * ============================================================================
@@ -168,10 +168,19 @@
             return;
         }
 
-        if (subject.isActor() && !this._action.isGuard() && !subject._mathSolvedForThisTurn) {
+        // --- NEW: Check if this is our character in multiplayer! ---
+        let isLocal = true;
+        if (window.SimpleP2P && window.SimpleP2P.isLocalActor) {
+            isLocal = window.SimpleP2P.isLocalActor(subject);
+        }
+
+        if (subject.isActor() && !this._action.isGuard() && !subject._mathSolvedForThisTurn && isLocal) {
             
             this._action._mathProcessed = true; 
             MathSystem.isMathPaused = true;
+            
+            // FIX: Put target back in queue so the main engine handles damage natively after unpausing!
+            this._targets.unshift(target);
             
             let mathLevel = subject.level;
             if ($gameVariables.value(50) > 0) {
@@ -233,7 +242,8 @@
             });
 
         } else {
-            if (!subject.isActor()) {
+            // If it's an enemy OR a remote player's character, reset modifiers!
+            if (!subject.isActor() || !isLocal) {
                  MathSystem.resultMultiplier = 1.0;
                  MathSystem.forceCrit = false;
                  MathSystem.forceMiss = false;

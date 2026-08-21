@@ -1,7 +1,7 @@
 /*:
  * @target MZ
  * @plugindesc Extremely simple enemy scaling. Safe for existing saves.
- * @author Gemini AI
+ * 
  *
  * @param Growth Rate
  * @desc Percent increase per level (e.g., 0.03 = 3%).
@@ -60,8 +60,8 @@
         }
         const avgLvl = Math.max(1, Math.floor(lvlSum / party.length));
 
-        // Apply Scaling: Base * (1 + (0.03 * Level))
-        return Math.floor(base * (1 + (rate * (avgLvl - 1))));
+        // Apply Scaling: Compound Exponential Growth (Base * (1 + Rate)^Level)
+        return Math.floor(base * Math.pow(1 + rate, avgLvl - 1));
     };
     
     // Scale EXP and Gold too
@@ -75,7 +75,7 @@
         for (const actor of party) lvlSum += actor.level;
         const avgLvl = Math.max(1, Math.floor(lvlSum / party.length));
         
-        return Math.floor(base * (1 + (rate * (avgLvl - 1))));
+        return Math.floor(base * Math.pow(1 + rate, avgLvl - 1));
     };
 
     const _Game_Enemy_gold = Game_Enemy.prototype.gold;
@@ -88,7 +88,7 @@
         for (const actor of party) lvlSum += actor.level;
         const avgLvl = Math.max(1, Math.floor(lvlSum / party.length));
         
-        return Math.floor(base * (1 + (rate * (avgLvl - 1))));
+        return Math.floor(base * Math.pow(1 + rate, avgLvl - 1));
     };
 
 })();
