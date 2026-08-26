@@ -523,23 +523,15 @@
                     </h3>
                 </div>
 
-                <!-- Right Links Columns -->
-                <div class="grid grid-cols-2 gap-12 sm:gap-16 md:gap-24">
+                <!-- Right Links Column -->
+                <div>
                     <!-- Product Column -->
                     <div>
                         <h4 class="text-[13px] font-bold text-[#096936] uppercase tracking-wider mb-4">Explore</h4>
                         <ul class="space-y-2.5 text-[14px] font-medium text-[#096936]">
                             <li><a href="game/web/index.html" class="hover:text-ink-primary transition-colors">Play in browser</a></li>
-                            <li><a href="#story-reveal" class="hover:text-ink-primary transition-colors">Story & Features</a></li>
+                            <li><a href="#interactive-experience" class="hover:text-ink-primary transition-colors">Story & Features</a></li>
                             <li><a href="game/Chronicles-of-Arithmos-PC.zip" download class="hover:text-ink-primary transition-colors">Download Game</a></li>
-                        </ul>
-                    </div>
-
-                    <!-- Resources Column -->
-                    <div>
-                        <h4 class="text-[13px] font-bold text-[#096936] uppercase tracking-wider mb-4">Resources</h4>
-                        <ul class="space-y-2.5 text-[14px] font-medium text-[#096936]">
-                            <li><a href="#interactive-experience" class="hover:text-ink-primary transition-colors">Game Manual</a></li>
                         </ul>
                     </div>
                 </div>
@@ -559,8 +551,7 @@
 
                 <!-- Right Sub-links -->
                 <div class="flex flex-wrap items-center justify-center gap-6 text-[13px] text-text-muted">
-                    <a href="#story-reveal" class="hover:text-ink transition-colors">About Project</a>
-                    <button type="button" onclick="document.getElementById('privacyModal').showModal()" class="hover:text-ink transition-colors cursor-pointer bg-transparent border-0 p-0 text-[13px] text-text-muted">Privacy Policy</button>
+                    <a href="privacy.html" class="hover:text-ink transition-colors">Privacy Policy</a>
                     <button type="button" onclick="document.getElementById('termsModal').showModal()" class="hover:text-ink transition-colors cursor-pointer bg-transparent border-0 p-0 text-[13px] text-text-muted">Terms of Use</button>
                 </div>
             </div>
@@ -919,22 +910,7 @@
             </button>
         </div>
     </dialog>
-    <!-- Privacy Policy Modal -->
-    <dialog id="privacyModal" class="backdrop:bg-black/60 backdrop:backdrop-blur-sm rounded-2xl bg-canvas text-ink border border-hairline p-6 sm:p-8 max-w-xl w-[90vw] shadow-2xl m-auto">
-        <div class="flex items-center justify-between border-b border-hairline pb-4 mb-4">
-            <h3 class="font-display text-2xl text-ink">Privacy Policy</h3>
-            <button type="button" onclick="document.getElementById('privacyModal').close()" class="text-text-muted hover:text-ink p-1 rounded-full text-xl leading-none">&times;</button>
-        </div>
-        <div class="space-y-4 text-sm text-text-muted leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
-            <p><strong class="text-ink">Chronicles of Arithmos</strong> is designed as a safe, privacy-first educational math game for primary school students.</p>
-            <p><strong class="text-ink">1. Zero Data Collection:</strong> We do not collect, store, or sell any personal student data, email addresses, or identifying information.</p>
-            <p><strong class="text-ink">2. Local Browser Storage:</strong> Game progress, badges earned, and volume settings are stored strictly on your local web browser.</p>
-            <p><strong class="text-ink">3. Child Safety Guarantee:</strong> The game contains zero third-party ads, zero tracking scripts</p>
-        </div>
-        <div class="mt-6 pt-4 border-t border-hairline flex justify-end">
-            <button type="button" onclick="document.getElementById('privacyModal').close()" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Close</button>
-        </div>
-    </dialog>
+
 
     <!-- Terms of Use Modal -->
     <dialog id="termsModal" class="backdrop:bg-black/60 backdrop:backdrop-blur-sm rounded-2xl bg-canvas text-ink border border-hairline p-6 sm:p-8 max-w-xl w-[90vw] shadow-2xl m-auto">

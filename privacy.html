@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    
+    <!-- Title & SEO Metadata -->
+    <title>Privacy Policy — Chronicles of Arithmos</title>
+    <meta name="description" content="Privacy Policy for Chronicles of Arithmos. We are committed to a safe, privacy-first, ad-free educational math experience for young learners.">
+    <meta name="author" content="Chronicles of Arithmos Team">
+
+    <!-- Favicon & Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="images/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="180x180.png">
+
+    <!-- PWA Web App Manifest & Theme Color -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#096936">
+
+    <!-- Typography: EB Garamond & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        canvas: {
+                            DEFAULT: '#f5f5f5',
+                            soft: '#fafafa',
+                            deep: '#096936'
+                        },
+                        ink: {
+                            DEFAULT: '#096936',
+                            primary: '#2d985a',
+                            active: '#167648'
+                        },
+                        surface: {
+                            card: '#ffffff',
+                            strong: '#f0efed',
+                        },
+                        hairline: {
+                            DEFAULT: '#e7e5e4',
+                            soft: '#f0efed',
+                            strong: '#d6d3d1'
+                        },
+                        text: {
+                            body: '#4e4e4e',
+                            muted: '#777169'
+                        },
+                        orb: {
+                            mint: '#a7e5d3',
+                            peach: '#f4c5a8',
+                            lavender: '#c8b8e0',
+                            sky: '#a8c8e8',
+                            rose: '#e8b8c4'
+                        }
+                    },
+                    fontFamily: {
+                        display: ['"EB Garamond"', 'serif'],
+                        body: ['"Inter"', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 16px rgba(0, 0, 0, 0.04)',
+                        'card': '0 10px 30px -5px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02)',
+                    },
+                    letterSpacing: {
+                        'display-mega': '-1.92px',
+                        'display-xl': '-0.96px',
+                        'display-lg': '-0.36px',
+                        'body': '0.16px',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            background-color: #f5f5f5; 
+            color: #4e4e4e; 
+            letter-spacing: 0.16px;
+        }
+        
+        .hero-gradient-overlay {
+            background: linear-gradient(to bottom, rgba(245, 245, 245, 0.12) 0%, rgba(245, 245, 245, 0.45) 55%, rgba(245, 245, 245, 0.9) 88%, #f5f5f5 100%);
+        }
+        .orb-sky { background: radial-gradient(circle, rgba(132,193,123,0.4) 0%, rgba(245,245,245,0) 70%); }
+        .orb-lavender { background: radial-gradient(circle, rgba(87,176,102,0.3) 0%, rgba(245,245,245,0) 70%); }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f5f5f5; }
+        ::-webkit-scrollbar-thumb { background: #84c17b; border-radius: 10px; }
+
+        button, a { transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s; }
+        button:active, a:active { transform: scale(0.98); }
+        :focus-visible { outline: 2px solid #096936; outline-offset: 2px; border-radius: 4px; }
+    </style>
+</head>
+<body class="font-body antialiased flex flex-col min-h-screen overflow-x-hidden">
+
+    <!-- Top Navigation -->
+    <header class="fixed top-4 inset-x-0 w-full z-50 flex justify-center px-4 pointer-events-none">
+        <div class="w-full max-w-[1000px] bg-surface-card/90 backdrop-blur-md border border-hairline rounded-full shadow-soft flex items-center justify-between pl-5 md:pl-6 pr-2 py-2 transition-all pointer-events-auto">
+            <!-- Left: Logo & Back Link -->
+            <a href="index.html" class="flex items-center gap-3 group" title="Return to Home">
+                <img src="images/logo-transparent.png" alt="Chronicles of Arithmos" class="h-7 md:h-8 object-contain">
+                <span class="hidden sm:inline text-xs font-semibold uppercase tracking-wider text-[#096936] bg-[#096936]/10 px-2.5 py-1 rounded-full group-hover:bg-[#096936]/15 transition-colors">
+                    Home
+                </span>
+            </a>
+            
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center space-x-6">
+                <a href="index.html" class="text-[14px] font-medium text-text-muted hover:text-ink transition-colors flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Home
+                </a>
+                <a href="index.html#interactive-experience" class="text-[14px] font-medium text-text-muted hover:text-ink transition-colors">Overview</a>
+                <a href="index.html#game-overview" class="text-[14px] font-medium text-text-muted hover:text-ink transition-colors">Story & Realms</a>
+            </nav>
+
+            <!-- Right: Play CTA -->
+            <div class="flex items-center space-x-2">
+                <a href="game/web/index.html" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-[14px] font-medium transition-colors shadow-sm inline-block">
+                    Play Free
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow pt-[105px] md:pt-[130px] pb-20 px-4 sm:px-6 relative">
+        <!-- Atmospheric Ambient Glows -->
+        <div class="absolute top-0 left-1/4 w-[600px] h-[600px] orb-sky rounded-full blur-[90px] pointer-events-none -z-10"></div>
+        <div class="absolute top-80 right-10 w-[500px] h-[500px] orb-lavender rounded-full blur-[80px] pointer-events-none -z-10"></div>
+
+        <div class="max-w-4xl mx-auto">
+            
+            <!-- Header Breadcrumb & Tag -->
+            <div class="mb-6 flex flex-wrap items-center gap-2 text-xs font-medium">
+                <a href="index.html" class="text-[#096936] hover:underline flex items-center gap-1">
+                    <span>Home</span>
+                </a>
+                <span class="text-text-muted">/</span>
+                <span class="text-text-muted">Legal & Transparency</span>
+            </div>
+
+            <!-- Page Title Header -->
+            <div class="mb-10 sm:mb-12">
+                <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#096936]/10 text-[#096936] text-xs font-semibold tracking-wide uppercase mb-4">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Student Privacy & Safety
+                </div>
+                <h1 class="font-display text-ink text-4xl sm:text-5xl md:text-6xl font-normal leading-[1.1] tracking-display-lg mb-4">
+                    Privacy Policy
+                </h1>
+                <p class="text-text-body text-base sm:text-lg max-w-2xl leading-relaxed">
+                    <strong>Chronicles of Arithmos</strong> is built from the ground up to provide a safe, transparent, and completely private educational math experience for young learners.
+                </p>
+                <div class="mt-4 pt-4 border-t border-hairline flex flex-wrap items-center gap-4 text-xs text-text-muted">
+                    <span><strong>Effective Date:</strong> Academic Year 2025–2026</span>
+                    <span>•</span>
+                    <span><strong>Target Audience:</strong> Primary School Students (Grades 1–6) & Educators</span>
+                </div>
+            </div>
+
+            <!-- Privacy Policy Content Grid / Cards -->
+            <div class="space-y-6 sm:space-y-8">
+                
+                <!-- Section 1: Summary Banner -->
+                <div class="bg-gradient-to-br from-[#096936]/10 via-[#096936]/5 to-transparent border border-[#096936]/20 rounded-2xl p-6 sm:p-8">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-[#096936] text-white flex items-center justify-center shrink-0 shadow-sm">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="font-display text-xl sm:text-2xl text-ink font-semibold mb-2">Our Core Privacy Pledge</h2>
+                            <p class="text-text-body text-sm sm:text-base leading-relaxed">
+                                We believe that educational software should never compromise child privacy. We do not require accounts, we do not track student behavior across the internet, and we do not collect, monetize, or transmit any personal data.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Zero Personal Data Collection -->
+                <article class="bg-surface-card border border-hairline rounded-2xl p-6 sm:p-8 shadow-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 rounded-full bg-surface-strong text-ink font-semibold text-sm flex items-center justify-center">1</span>
+                        <h2 class="font-display text-2xl text-ink font-semibold">Zero Personal Data Collection</h2>
+                    </div>
+                    <div class="space-y-3 text-text-body text-sm sm:text-[15px] leading-relaxed">
+                        <p>When you or your students use or play <strong>Chronicles of Arithmos</strong>:</p>
+                        <ul class="list-disc list-inside space-y-2 text-text-body pl-2">
+                            <li><strong class="text-ink">No Account Registration:</strong> Students do not create an account, log in, or provide any email address or username.</li>
+                            <li><strong class="text-ink">No Personal Identifiers:</strong> We never ask for, collect, or store student real names, ages, phone numbers, location data, or school IDs.</li>
+                            <li><strong class="text-ink">No Device Fingerprinting:</strong> We do not collect hardware identifiers, IP addresses for profiling, or browser fingerprinting metrics.</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Section 3: Local Device Storage -->
+                <article class="bg-surface-card border border-hairline rounded-2xl p-6 sm:p-8 shadow-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 rounded-full bg-surface-strong text-ink font-semibold text-sm flex items-center justify-center">2</span>
+                        <h2 class="font-display text-2xl text-ink font-semibold">Local Storage & Gameplay Saves</h2>
+                    </div>
+                    <div class="space-y-3 text-text-body text-sm sm:text-[15px] leading-relaxed">
+                        <p>
+                            To allow players to resume their adventure, earned badges, math skill levels, inventory items, and sound volume preferences are saved exclusively using standard client-side <code>localStorage</code> within the user's web browser.
+                        </p>
+                        <div class="bg-surface-strong/70 border border-hairline rounded-xl p-4 mt-2">
+                            <p class="text-xs sm:text-sm text-text-muted">
+                                <strong>Important:</strong> All save data stays 100% on the local computer or tablet. It is never transmitted across the network to our academic servers or any third parties.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Section 4: Child Safety & No Advertisements -->
+                <article class="bg-surface-card border border-hairline rounded-2xl p-6 sm:p-8 shadow-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 rounded-full bg-surface-strong text-ink font-semibold text-sm flex items-center justify-center">3</span>
+                        <h2 class="font-display text-2xl text-ink font-semibold">Child Safety & Ad-Free Guarantee</h2>
+                    </div>
+                    <div class="space-y-3 text-text-body text-sm sm:text-[15px] leading-relaxed">
+                        <p>
+                            Primary school students deserve a distraction-free learning environment focused entirely on mathematical confidence and problem solving.
+                        </p>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div class="p-4 rounded-xl bg-surface-strong/50 border border-hairline flex flex-col gap-1.5">
+                                <span class="font-semibold text-ink text-sm">🚫 Zero Third-Party Ads</span>
+                                <span class="text-xs text-text-muted">No banner ads, popups, video promotions, or sponsored commercial links.</span>
+                            </div>
+                            <div class="p-4 rounded-xl bg-surface-strong/50 border border-hairline flex flex-col gap-1.5">
+                                <span class="font-semibold text-ink text-sm">🔒 Zero Tracking Scripts</span>
+                                <span class="text-xs text-text-muted">No cross-site tracking, behavioral analytics, or third-party marketing pixels.</span>
+                            </div>
+                            <div class="p-4 rounded-xl bg-surface-strong/50 border border-hairline flex flex-col gap-1.5">
+                                <span class="font-semibold text-ink text-sm">💎 Zero In-App Purchases</span>
+                                <span class="text-xs text-text-muted">No paywalls, loot mechanics, or commercial transactions. Fully free for education.</span>
+                            </div>
+                            <div class="p-4 rounded-xl bg-surface-strong/50 border border-hairline flex flex-col gap-1.5">
+                                <span class="font-semibold text-ink text-sm">🛡️ Child-Centric Security</span>
+                                <span class="text-xs text-text-muted">Compliant with the core principles of COPPA (Children's Online Privacy Protection).</span>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Section 5: Data Management & Resetting Progress -->
+                <article class="bg-surface-card border border-hairline rounded-2xl p-6 sm:p-8 shadow-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 rounded-full bg-surface-strong text-ink font-semibold text-sm flex items-center justify-center">4</span>
+                        <h2 class="font-display text-2xl text-ink font-semibold">Managing & Clearing Your Data</h2>
+                    </div>
+                    <div class="space-y-3 text-text-body text-sm sm:text-[15px] leading-relaxed">
+                        <p>
+                            Because all save files and game preferences reside entirely in your browser's local storage:
+                        </p>
+                        <ul class="list-disc list-inside space-y-1.5 text-text-body pl-2">
+                            <li>You can delete or reset all game progress at any time by clearing your browser's site data / cache.</li>
+                            <li>Using the in-game options menu allows you to overwrite, start a new adventure, or clear saved slots.</li>
+                            <li>Uninstalling the Progressive Web App (PWA) or removing the PC game folder will automatically erase locally stored data from your machine.</li>
+                        </ul>
+                    </div>
+                </article>
+
+                <!-- Section 6: Academic Project Context & Contact -->
+                <article class="bg-surface-card border border-hairline rounded-2xl p-6 sm:p-8 shadow-card">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="w-8 h-8 rounded-full bg-surface-strong text-ink font-semibold text-sm flex items-center justify-center">5</span>
+                        <h2 class="font-display text-2xl text-ink font-semibold">Academic Context & Questions</h2>
+                    </div>
+                    <div class="space-y-3 text-text-body text-sm sm:text-[15px] leading-relaxed">
+                        <p>
+                            <strong>Chronicles of Arithmos</strong> is an undergraduate academic capstone project focused on gamified learning methodologies and educational technology research.
+                        </p>
+                        <p>
+                            If you are an educator, parent, or researcher with inquiries regarding this privacy policy or the game's mechanics, feel free to reach out to the project research team through the academic repository.
+                        </p>
+                    </div>
+                </article>
+
+            </div>
+
+            <!-- Bottom Back & Play Actions -->
+            <div class="mt-12 pt-8 border-t border-hairline flex flex-col sm:flex-row items-center justify-between gap-4">
+                <a href="index.html" class="inline-flex items-center gap-2 text-sm font-medium text-text-muted hover:text-ink transition-colors">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    <span>Return to Home</span>
+                </a>
+                <div class="flex items-center gap-3">
+                    <a href="game/web/index.html" class="bg-ink-primary hover:bg-ink-active text-white px-6 py-2.5 rounded-full text-sm font-medium transition-colors shadow-sm">
+                        Play Game in Browser
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer Matching Index -->
+    <footer class="relative isolate overflow-hidden bg-canvas pt-16 pb-8 md:pt-20 md:pb-12 px-6 border-t border-hairline/60">
+        <div class="max-w-[1450px] mx-auto relative z-20 flex flex-col">
+
+            <!-- Top Footer Grid -->
+            <div class="flex flex-col md:flex-row justify-between items-start gap-10 md:gap-16 mb-12 md:mb-16">
+                <!-- Left Tagline -->
+                <div class="max-w-md">
+                    <h3 class="font-display text-ink text-[28px] md:text-[36px] leading-[1.15] tracking-display-lg">
+                        Experience the adventure
+                    </h3>
+                    <p class="text-text-muted text-sm mt-3">
+                        A privacy-first educational RPG empowering young students to master primary mathematics.
+                    </p>
+                </div>
+
+                <!-- Right Links Column -->
+                <div>
+                    <div>
+                        <h4 class="text-[13px] font-bold text-[#096936] uppercase tracking-wider mb-4">Explore</h4>
+                        <ul class="space-y-2.5 text-[14px] font-medium text-[#096936]">
+                            <li><a href="index.html" class="hover:text-ink-primary transition-colors">Home</a></li>
+                            <li><a href="game/web/index.html" class="hover:text-ink-primary transition-colors">Play in browser</a></li>
+                            <li><a href="index.html#interactive-experience" class="hover:text-ink-primary transition-colors">Story & Features</a></li>
+                            <li><a href="game/Chronicles-of-Arithmos-PC.zip" download class="hover:text-ink-primary transition-colors">Download Game</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Giant Brand Display Text -->
+            <div class="w-full my-2 md:my-6 overflow-hidden select-none">
+                <h2 class="font-display text-ink/90 text-[13vw] sm:text-[14vw] lg:text-[150px] font-normal leading-none tracking-tight text-center md:text-left uppercase whitespace-nowrap">
+                    Arithmos
+                </h2>
+            </div>
+
+            <!-- Bottom Sub-footer Bar -->
+            <div class="border-t border-hairline/80 pt-8 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <!-- Copyright -->
+                <span class="text-[13px] text-text-muted">© 2026 Chronicles of Arithmos</span>
+
+                <!-- Right Sub-links -->
+                <div class="flex flex-wrap items-center justify-center gap-6 text-[13px] text-text-muted">
+                    <a href="privacy.html" class="text-ink font-semibold transition-colors">Privacy Policy</a>
+                    <button type="button" onclick="document.getElementById('termsModal').showModal()" class="hover:text-ink transition-colors cursor-pointer bg-transparent border-0 p-0 text-[13px] text-text-muted">Terms of Use</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Terms of Use Modal -->
+    <dialog id="termsModal" class="backdrop:bg-black/60 backdrop:backdrop-blur-sm rounded-2xl bg-canvas text-ink border border-hairline p-6 sm:p-8 max-w-xl w-[90vw] shadow-2xl m-auto">
+        <div class="flex items-center justify-between border-b border-hairline pb-4 mb-4">
+            <h3 class="font-display text-2xl text-ink">Terms of Use</h3>
+            <button type="button" onclick="document.getElementById('termsModal').close()" class="text-text-muted hover:text-ink p-1 rounded-full text-xl leading-none">&times;</button>
+        </div>
+        <div class="space-y-4 text-sm text-text-muted leading-relaxed max-h-[60vh] overflow-y-auto pr-2">
+            <p><strong class="text-ink">Chronicles of Arithmos</strong> is provided for non-commercial educational and learning purposes.</p>
+            <p><strong class="text-ink">1. Educational Use:</strong> Students, parents, and educators may freely play, share, and utilize the game for primary school mathematics learning.</p>
+            <p><strong class="text-ink">2. Intellectual Property:</strong> All original artwork, game sprites, story elements, and puzzles belong to the Chronicles of Arithmos academic project team.</p>
+            <p><strong class="text-ink">3. Fair Play:</strong> Play responsibly and enjoy solving math challenges with friends!</p>
+        </div>
+        <div class="mt-6 pt-4 border-t border-hairline flex justify-end">
+            <button type="button" onclick="document.getElementById('termsModal').close()" class="bg-ink-primary hover:bg-ink-active text-white px-5 py-2 rounded-full text-xs font-medium transition-colors cursor-pointer">Close</button>
+        </div>
+    </dialog>
+
+</body>
+</html>
