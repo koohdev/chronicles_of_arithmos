@@ -41,32 +41,37 @@
             let problemData = {};
             let safetyCount = 0;
 
-            while (!isValid && safetyCount < 300) {
+            while (!isValid && safetyCount < 1000) {
                 safetyCount++;
                 let visualStr = "";
-                let formulaStr = "";
                 let numTerms = 2;
                 let operatorsPool = ['+', '-'];
-                let useParens = false;
                 let maxVal = 20;
 
-                // --- DIFFICULTY CONFIG ---
-                if (level >= 40) { 
-                    numTerms = 3; 
+                // --- C.1 Level 1-29 (Basics) ---
+                if (level < 30) {
+                    numTerms = 2;
+                    operatorsPool = ['+', '-'];
+                    maxVal = 30;
+                }
+                // --- C.2 Level 30-69 (Intermediate) ---
+                else if (level < 70) {
+                    numTerms = 2;
+                    operatorsPool = ['+', '-', '*', '/']; // Mixes all 4 operations!
                     maxVal = 50; 
                 }
-                if (level >= 50) {
+                // --- C.3 Level 70-100 (Advanced) ---
+                else {
+                    numTerms = 3;
                     operatorsPool = ['+', '-', '*', '/'];
-                    if (Math.random() < 0.5) useParens = true; 
-                    maxVal = 100;
-                }
-                if (level >= 70) {
-                    maxVal = 500; 
+                    maxVal = 50;
                 }
 
                 // Generate Numbers
                 let nums = [];
-                for(let i=0; i<numTerms; i++) nums.push(Math.floor(Math.random() * maxVal) + 1);
+                for(let i=0; i<numTerms; i++) {
+                    nums.push(Math.floor(Math.random() * maxVal) + 1);
+                }
 
                 // Generate Operators
                 let ops = [];
@@ -82,24 +87,33 @@
                 // --- CONSTRAINT: Multiplication & Division Scaling ---
                 for (let i = 0; i < ops.length; i++) {
                     if (ops[i] === '*' || ops[i] === '/') {
-                        nums[i+1] = Math.floor(Math.random() * 20) + 1;
+                        nums[i+1] = Math.floor(Math.random() * 20) + 1; // Caps second number at 20!
+                        
+                        if (ops[i] === '/') {
+                            // Ensure clean division so the loop doesn't fail!
+                            // Ex: if nums[i+1] is 5, it forces nums[i] to be 10, 15, 20, etc.
+                            nums[i] = nums[i+1] * (Math.floor(Math.random() * 10) + 2);
+                        }
                     }
                 }
 
                 // Construct Visual String
-                if (level >= 50 && useParens && numTerms === 3) {
+                if (level >= 70) {
+                    // Force 3 parts with Parentheses
+                    let op1 = ops[0];
+                    let op2 = ops[1];
                     if (Math.random() < 0.5) {
-                        visualStr = `(${nums[0]} ${ops[0]} ${nums[1]}) ${ops[1]} ${nums[2]}`;
+                        visualStr = `(${nums[0]} ${op1} ${nums[1]}) ${op2} ${nums[2]}`;
                     } else {
-                        visualStr = `${nums[0]} ${ops[0]} (${nums[1]} ${ops[1]} ${nums[2]})`;
+                        visualStr = `${nums[0]} ${op1} (${nums[1]} ${op2} ${nums[2]})`;
                     }
                 } else {
-                    visualStr = `${nums[0]}`;
-                    for (let i=0; i<ops.length; i++) visualStr += ` ${ops[i]} ${nums[i+1]}`;
+                    // 2 Parts
+                    visualStr = `${nums[0]} ${ops[0]} ${nums[1]}`;
                 }
 
                 // Evaluate Answer
-                formulaStr = visualStr; 
+                let formulaStr = visualStr; 
                 let rawAnswer = 0;
                 try { rawAnswer = eval(formulaStr); } catch (e) { continue; }
                 
@@ -140,7 +154,14 @@
                 isValid = true;
             }
             
-            if (!isValid) return { question: "2 + 2 = ?", answer: 4, maxTime: 300 };
+            // --- BUG FIX: LEVEL-APPROPRIATE FALLBACKS ---
+            // If the loop fails (rare), it defaults to a question matching the level bracket!
+            if (!isValid) {
+                if (level >= 70) return { question: "(10 + 5) * 2 = ?", answer: 30, maxTime: 400 };
+                if (level >= 30) return { question: "12 * 4 = ?", answer: 48, maxTime: 300 };
+                return { question: "15 + 7 = ?", answer: 22, maxTime: 200 };
+            }
+            
             return problemData;
         }
     };
